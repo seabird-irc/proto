@@ -32,7 +32,7 @@ Because of this, each plugin will need to maintain their own connection to the d
 ## Client connection flow
 
 1. Plugin initializes
-2. Plugin calls `Register`
+2. Plugin calls `OpenSession`
 3. Plugin streams `Events`
 
 ## What is "core"?

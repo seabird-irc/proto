@@ -6,7 +6,7 @@ package seabird;
 
 // Identity is included in every message that requires auth. One AuthMethod at a
 // time is supported. For now, the only supported method is a token. You can
-// obtain a full Identity from the Register method.
+// obtain a full Identity from the OpenSession method.
 message Identity {
   oneof AuthMethod {
     string token = 1;
@@ -14,7 +14,7 @@ message Identity {
 }
 
 service Seabird {
-  rpc Register(RegisterRequest) returns (RegisterResponse) {}
+  rpc OpenSession(OpenSessionRequest) returns (OpenSessionResponse) {}
 
   rpc Events(EventsRequest) returns (stream Event) {}
 
@@ -31,13 +31,13 @@ service Seabird {
   rpc GetPluginInfo(PluginInfoRequest) returns (PluginInfoResponse) {}
 }
 
-message RegisterRequest {
+message OpenSessionRequest {
   string plugin = 1;
 
   map<string, CommandMetadata> commands = 2;
 }
 
-message RegisterResponse {
+message OpenSessionResponse {
   Identity identity = 1;
 }
 
