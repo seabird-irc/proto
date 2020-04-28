@@ -53,7 +53,7 @@ message CommandMetadata {
 }
 
 message Event {
-  oneof Type {
+  oneof Inner {
     MessageEvent message = 1;
     PrivateMessageEvent privateMessage = 2;
     MentionEvent mention = 3;
