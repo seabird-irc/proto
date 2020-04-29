@@ -27,8 +27,8 @@ service Seabird {
   rpc JoinChannel(JoinChannelRequest) returns (JoinChannelResponse) {}
   rpc LeaveChannel(LeaveChannelRequest) returns (LeaveChannelResponse) {}
 
-  rpc ListPlugins(ListPluginsRequest) returns (ListPluginsResponse) {}
-  rpc GetPluginInfo(PluginInfoRequest) returns (PluginInfoResponse) {}
+  rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse) {}
+  rpc GetSessionInfo(SessionInfoRequest) returns (SessionInfoResponse) {}
 }
 
 message OpenSessionRequest {
@@ -154,24 +154,28 @@ message LeaveChannelRequest {
 
 message LeaveChannelResponse {}
 
-message ListPluginsRequest {
+message ListSessionsRequest {
   Identity identity = 1;
 }
 
-message ListPluginsResponse {
-  repeated string names = 1;
+message ListSessionsResponse {
+  repeated string sessionIds = 1;
 }
 
-message PluginInfoRequest {
+message SessionInfoRequest {
   Identity identity = 1;
 
-  string name = 2;
+  string sessionId = 2;
 }
 
-message PluginInfoResponse {
-  string name = 1;
+message SessionInfoResponse {
+  string sessionId = 1;
 
-  map<string, CommandMetadata> commands = 2;
+  // NOTE: sessionName is not unique - it's specified by the plugin on
+  // connection
+  string sessionName = 2;
+
+  map<string, CommandMetadata> commands = 3;
 
   // TODO: find a way to track IPs related to plugins - maybe deny connections
   // from an IP other than the registration
