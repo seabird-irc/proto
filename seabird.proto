@@ -32,7 +32,7 @@ service Seabird {
 }
 
 message OpenSessionRequest {
-  string plugin = 1;
+  string tag = 1;
 
   map<string, CommandMetadata> commands = 2;
 }
@@ -170,12 +170,10 @@ message SessionInfoRequest {
 
 message SessionInfoResponse {
   string sessionId = 1;
+  string sessionTag = 2;
+  repeated string streamIds = 3;
 
-  // NOTE: sessionName is not unique - it's specified by the plugin on
-  // connection
-  string sessionName = 2;
-
-  map<string, CommandMetadata> commands = 3;
+  map<string, CommandMetadata> commands = 4;
 
   // TODO: find a way to track IPs related to plugins - maybe deny connections
   // from an IP other than the registration
