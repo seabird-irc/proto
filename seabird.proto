@@ -39,6 +39,7 @@ message OpenSessionRequest {
 
 message OpenSessionResponse {
   Identity identity = 1;
+  string serverVersion = 2;
 }
 
 message EventsRequest {
