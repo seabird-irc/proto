@@ -4,15 +4,13 @@ This repository contains Seabird's gRPC protobuf definitions.
 
 ## What is this?
 
-This project moves Seabird plugins from individual threads in the same process as Seabird proper out into completely separate processes (even in separate containers/hosts/etc) that communicate with the `core` bot over RPC.
+This project moves Seabird plugins from the same process as Seabird proper out into completely separate processes (even in separate containers/hosts/etc) that communicate with the `core` bot over RPC.
 
-## ...why?
+## But why?
 
 1. This setup allows for low-interruption upgrades of individual plugins.
 
-2. This setup enables finer-grained, cleaner control over access to the bot.
-
-This in particular is useful for defining an admin interface for the bot. The
+2. This setup enables finer-grained, cleaner control over access to the bot. In particular it allows us to define an admin interface for the bot over RPC and make tools for it.
 
 3. This setup allows for testing plugin instances against the production version of the `core`.
 
@@ -29,28 +27,31 @@ We need to make sure to have a good README and wikis as necessary to set this up
 3. The database connection cannot easily be shared
 Because of this, each plugin will need to maintain their own connection to the database if they need it.
 
-## Client connection flow
+## Client connection information
 
-1. Plugin initializes
-2. Plugin calls `OpenSession`
-3. Plugin streams `Events`
+Each gRPC request contains an Identity as the first field. This should be constructed with an auth token. Auth tokens need to be manually configured on the server side.
 
 ## What is "core"?
-`core` is the core IRC bot that maintains a connection to a given IRC server. It's the server on the other end of the gRPC connection.
+
+`core` is the core process that maintains a connection to a given IRC server. It's the server on the other end of the gRPC connection.
 
 ## As a client, what can I expect from core?
+
 Every incoming IRC message that `core` receives from its connected IRC server will be sent to each connected plugin through that plugin’s event stream.
 
-Events will be delivered to plugins at most one time. Messages will not be queued, nor do they require acks from plugins (beyond gRPC's internal protocol).
+Events will be delivered to plugins at most one time. Messages may be queued, but there is no guarantee. If an event stream starts lagging behind, it will be dropped.
 
 ## What happens if core restarts?
-If the running instance of `core` restarts, all client connections will be interrupted. Each client will need to reconnect (see [this](#client-connection-flow)).
+
+If the running instance of `core` restarts, all client connections will be interrupted. Each client will need to reconnect (see the [client connection information](#client-connection-information)).
 
 ## Are plugins allowed to reconnect?
+
 Yes. Additionally, there is no limitation on opened event streams by clients.
 
 ## I want to use this! How do I do that?
-Unfortunately, this is under active development and is pretty clunky for now.
+
+Unfortunately, this is under active development and still fairly clunky, but if you really want to get involved you're welcome to!
 
 You'll need at a minimum a running instance of [core](https://github.com/seabird-irc/seabird-core). From there, you may clone various plugin repositories as desired and configure them to connect to `core`.
 
