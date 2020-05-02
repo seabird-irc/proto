@@ -162,7 +162,7 @@ message StreamInfoRequest {
 
 message StreamInfoResponse {
   string id = 1;
-  string owner = 2;
+  string tag = 2;
 
   map<string, CommandMetadata> commands = 3;
 
