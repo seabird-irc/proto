@@ -25,7 +25,7 @@ service Seabird {
   // Chat connection introspection
   rpc ListChannels(ListChannelsRequest) returns (ListChannelsResponse);
   rpc GetChannelInfo(ChannelInfoRequest) returns (ChannelInfoResponse);
-  rpc SetChannelInfo(SetChannelInfoRequest) returns (SetChannelInfoResponse);
+  rpc SetChannelTopic(SetChannelTopicRequest) returns (SetChannelTopicResponse);
 
   // Seabird introspection
   rpc ListStreams(ListStreamsRequest) returns (ListStreamsResponse);
@@ -114,14 +114,14 @@ message User {
   string nick = 1;
 }
 
-message SetChannelInfoRequest {
+message SetChannelTopicRequest {
   Identity identity = 1;
 
   string name = 2;
   string topic = 3;
 }
 
-message SetChannelInfoResponse {}
+message SetChannelTopicResponse {}
 
 message ChannelInfoResponse {
   string name = 1;
@@ -132,7 +132,7 @@ message ChannelInfoResponse {
 message JoinChannelRequest {
   Identity identity = 1;
 
-  string target = 2;
+  string name = 2;
 }
 
 message JoinChannelResponse {}
@@ -140,7 +140,7 @@ message JoinChannelResponse {}
 message LeaveChannelRequest {
   Identity identity = 1;
 
-  string target = 2;
+  string name = 2;
   string message = 3;
 }
 
