@@ -30,6 +30,7 @@ service Seabird {
   // Seabird introspection
   rpc ListStreams(ListStreamsRequest) returns (ListStreamsResponse);
   rpc GetStreamInfo(StreamInfoRequest) returns (StreamInfoResponse);
+  rpc GetCoreInfo(CoreInfoRequest) returns (CoreInfoResponse);
 }
 
 message StreamEventsRequest {
@@ -166,6 +167,13 @@ message StreamInfoResponse {
 
   map<string, CommandMetadata> commands = 3;
 
-  // TODO: find a way to track IPs related to plugins - maybe deny connections
-  // from an IP other than the registration
+  string remote_address = 4;
+  uint64 connection_timestamp = 5;
+}
+
+message CoreInfoRequest {}
+
+message CoreInfoResponse {
+  string current_nick = 1;
+  uint64 startup_timestamp = 2;
 }
