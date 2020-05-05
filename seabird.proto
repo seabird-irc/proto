@@ -168,7 +168,7 @@ message StreamInfoResponse {
   map<string, CommandMetadata> commands = 3;
 
   string remote_address = 4;
-  uint64 connection_timestamp = 5;
+  int64 connection_timestamp = 5;
 }
 
 message CoreInfoRequest {
@@ -177,5 +177,5 @@ message CoreInfoRequest {
 
 message CoreInfoResponse {
   string current_nick = 1;
-  uint64 startup_timestamp = 2;
+  int64 startup_timestamp = 2;
 }
