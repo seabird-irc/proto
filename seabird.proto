@@ -167,14 +167,13 @@ message StreamInfoResponse {
 
   map<string, CommandMetadata> commands = 3;
 
-  string ip = 4;
-  uint64 connection_time = 5;
+  string remote_address = 4;
+  uint64 connection_timestamp = 5;
 }
 
-message CoreInfoRequest {
-}
+message CoreInfoRequest {}
 
 message CoreInfoResponse {
-  string nick = 1;
-  uint64 uptime = 2;
+  string current_nick = 1;
+  uint64 startup_timestamp = 2;
 }
