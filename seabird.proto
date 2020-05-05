@@ -171,7 +171,9 @@ message StreamInfoResponse {
   uint64 connection_timestamp = 5;
 }
 
-message CoreInfoRequest {}
+message CoreInfoRequest {
+  Identity identity = 1;
+}
 
 message CoreInfoResponse {
   string current_nick = 1;
