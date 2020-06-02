@@ -18,7 +18,6 @@ service Seabird {
 
   // Chat actions
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
-  rpc SendRawMessage(SendRawMessageRequest) returns (SendRawMessageResponse);
   rpc JoinChannel(JoinChannelRequest) returns (JoinChannelResponse);
   rpc LeaveChannel(LeaveChannelRequest) returns (LeaveChannelResponse);
 
@@ -87,15 +86,6 @@ message SendMessageRequest {
 }
 
 message SendMessageResponse {}
-
-message SendRawMessageRequest {
-  Identity identity = 1;
-
-  string command = 2;
-  repeated string params = 3;
-}
-
-message SendRawMessageResponse {}
 
 message ListChannelsRequest {
   Identity identity = 1;
