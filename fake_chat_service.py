@@ -6,13 +6,13 @@ async def run_discord_bot():
     # Manage your Discord connection here
     while True:
         await asyncio.sleep(42)
-        if we_were_kicked_from_a_channel():
-            pretend_this_is_safe.push(("leave_channel", "magically_received_channel_id"))
+        if await we_were_kicked_from_a_channel():
+            await pretend_this_is_safe.push(("leave_channel", "magically_received_channel_id"))
 
 
 async def read_incoming_core_messages():
-    with connect_to_server() as client:
-        client.Register(
+    async with connect_to_server() as client:
+        await client.Register(
             RegisterRequest(
                 identity=fake_identity,
                 id="discord, yo",
@@ -25,22 +25,22 @@ async def read_incoming_core_messages():
         )
 
         event_queue = client.StreamEvents(StreamEventsRequest(identity=fake_identity))
-        for thing in magical_select(event_queue, pretend_this_is_safe, timer(10)):
+        for thing in await magical_select(event_queue, pretend_this_is_safe, timer(10)):
             if isinstance(thing, TimerTick):
                 # Timer tick
                 nonce = "lol"
-                result = client.Heartbeat(HeartbeatRequest(nonce))
+                result = await client.Heartbeat(HeartbeatRequest(nonce))
                 if result.nonce != nonce:
                     print("uh oh")
             elif isinstance(thing, Event):
                 # Seabird Core event
-                do_discord_stuff_with_event(event)
+                await do_discord_stuff_with_event(event)
             else:
                 # Queue
                 action, channel_id = thing
 
                 if action == "leave_channel":
-                    client.DeregisterChannels(
+                    await client.DeregisterChannels(
                         DeregisterChannelsRequest(
                             identity=fake_identity,
                             channel_ids=[channel_id],
@@ -53,17 +53,17 @@ class ChatServiceHandler:
         """pretend there's something here"""
 
     async def JoinChannel(self, request: JoinChannelRequest) -> JoinChannelResponse:
-        join_discord_channel(request.channel_name)
+        await join_discord_channel(request.channel_name)
 
         return JoinChannelResponse()
 
     async def LeaveChannel(self, request: LeaveChannelRequest) -> LeaveChannelResponse:
-        leave_discord_channel(get_channel_name_by_id(request.channel_id))
+        await leave_discord_channel(get_channel_name_by_id(request.channel_id))
 
         return LeaveChannelResponse()
 
     async def ListChannelUsers(self, request: ListChannelUsersRequest) -> ListChannelUsersResponse:
-        users = get_discord_channel_users(get_channel_name_by_id(request.channel_id))
+        users = await get_discord_channel_users(get_channel_name_by_id(request.channel_id))
 
         return ListChannelUsersResponse(
             channel_id=request.channel_id,
