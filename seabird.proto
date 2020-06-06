@@ -4,36 +4,10 @@ option go_package = ".;pb";
 
 package seabird;
 
-// Identity is included in every message that requires auth. One AuthMethod at a
-// time is supported. For now, the only supported method is a token. These need
-// to be created manually and distributed to any clients.
-message Identity {
-  oneof AuthMethod {
-    string token = 1;
-  }
-}
-
-service Seabird {
-  rpc StreamEvents(StreamEventsRequest) returns (stream Event);
-
-  // Chat actions
-  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
-  rpc JoinChannel(JoinChannelRequest) returns (JoinChannelResponse);
-  rpc LeaveChannel(LeaveChannelRequest) returns (LeaveChannelResponse);
-
-  // Chat connection introspection
-  rpc ListChannels(ListChannelsRequest) returns (ListChannelsResponse);
-  rpc GetChannelInfo(ChannelInfoRequest) returns (ChannelInfoResponse);
-  rpc SetChannelTopic(SetChannelTopicRequest) returns (SetChannelTopicResponse);
-
-  // Seabird introspection
-  rpc ListStreams(ListStreamsRequest) returns (ListStreamsResponse);
-  rpc GetStreamInfo(StreamInfoRequest) returns (StreamInfoResponse);
-  rpc GetCoreInfo(CoreInfoRequest) returns (CoreInfoResponse);
-}
+import "common.proto";
 
 message StreamEventsRequest {
-  Identity identity = 1;
+  common.Identity identity = 1;
 
   map<string, CommandMetadata> commands = 2;
 }
@@ -44,101 +18,74 @@ message CommandMetadata {
   string full_help = 3;
 }
 
-message Event {
-  oneof inner {
-    MessageEvent message = 1;
-    PrivateMessageEvent private_message = 2;
-    MentionEvent mention = 3;
-    CommandEvent command = 4;
-  }
-}
-
-message MessageEvent {
-  string reply_to = 1;
-  string sender = 2;
-  string message = 3;
-}
-
-message PrivateMessageEvent {
-  string reply_to = 1;
-  string sender = 2;
-  string message = 3;
-}
-
-message MentionEvent {
-  string reply_to = 1;
-  string sender = 2;
-  string message = 3;
-}
-
-message CommandEvent {
-  string reply_to = 1;
-  string sender = 2;
-  string command = 3;
-  string arg = 4;
-}
-
 message SendMessageRequest {
-  Identity identity = 1;
+  common.Identity identity = 1;
 
-  string target = 2;
-  string message = 3;
+  string destination_id = 2;
+  string text = 3;
 }
 
 message SendMessageResponse {}
 
+message ListServicesRequest {
+  common.Identity identity = 1;
+}
+
+message ListServicesResponse {
+  repeated common.Service services = 1;
+}
+
 message ListChannelsRequest {
-  Identity identity = 1;
+  common.Identity identity = 1;
+  string service_id = 2;
 }
 
 message ListChannelsResponse {
-  repeated string names = 1;
+  repeated common.Channel channels = 1;
 }
 
 message ChannelInfoRequest {
-  Identity identity = 1;
+  common.Identity identity = 1;
 
-  string name = 2;
+  string channel_id = 2;
 }
 
-message User {
-  string nick = 1;
+message ChannelInfoResponse {
+  string id = 1;
+  string name = 2;
+  string topic = 3;
+  repeated common.User users = 4;
 }
 
 message SetChannelTopicRequest {
-  Identity identity = 1;
+  common.Identity identity = 1;
 
-  string name = 2;
+  string channel_id = 2;
   string topic = 3;
 }
 
 message SetChannelTopicResponse {}
 
-message ChannelInfoResponse {
-  string name = 1;
-  string topic = 2;
-  repeated User users = 3;
-}
-
 message JoinChannelRequest {
-  Identity identity = 1;
+  common.Identity identity = 1;
 
-  string name = 2;
+  string server_id = 2;
+  string channel_name = 3;
 }
 
 message JoinChannelResponse {}
 
 message LeaveChannelRequest {
-  Identity identity = 1;
+  common.Identity identity = 1;
 
-  string name = 2;
-  string message = 3;
+  string channel_id = 2;
+  string exit_message = 3;
 }
 
 message LeaveChannelResponse {}
 
 message ListStreamsRequest {
-  Identity identity = 1;
+  common.Identity identity = 1;
 }
 
 message ListStreamsResponse {
@@ -146,7 +93,7 @@ message ListStreamsResponse {
 }
 
 message StreamInfoRequest {
-  Identity identity = 1;
+  common.Identity identity = 1;
 
   string stream_id = 2;
 }
@@ -162,10 +109,29 @@ message StreamInfoResponse {
 }
 
 message CoreInfoRequest {
-  Identity identity = 1;
+  common.Identity identity = 1;
 }
 
 message CoreInfoResponse {
   string current_nick = 1;
   int64 startup_timestamp = 2;
+}
+
+service Seabird {
+  rpc StreamEvents(StreamEventsRequest) returns (stream common.Event);
+
+  // Chat actions
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+  rpc JoinChannel(JoinChannelRequest) returns (JoinChannelResponse);
+  rpc LeaveChannel(LeaveChannelRequest) returns (LeaveChannelResponse);
+
+  // Chat connection introspection
+  rpc ListChannels(ListChannelsRequest) returns (ListChannelsResponse);
+  rpc GetChannelInfo(ChannelInfoRequest) returns (ChannelInfoResponse);
+  rpc SetChannelTopic(SetChannelTopicRequest) returns (SetChannelTopicResponse);
+
+  // Seabird introspection
+  rpc ListStreams(ListStreamsRequest) returns (ListStreamsResponse);
+  rpc GetStreamInfo(StreamInfoRequest) returns (StreamInfoResponse);
+  rpc GetCoreInfo(CoreInfoRequest) returns (CoreInfoResponse);
 }

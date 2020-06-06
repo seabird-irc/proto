@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+option go_package = ".;pb";
+
+import "common.proto";
+
+package seabird_chat_service;
+
+message JoinChannelRequest {
+  common.Identity identity = 1;
+
+  string channel_name = 2;
+}
+
+message JoinChannelResponse {}
+
+message LeaveChannelRequest {
+  common.Identity identity = 1;
+
+  string channel_id = 2;
+}
+
+message LeaveChannelResponse {}
+
+message ListChannelUsersRequest {
+  common.Identity identity = 1;
+
+  string channel_id = 2;
+}
+
+message ListChannelUsersResponse {
+  string channel_id = 1;
+  repeated string user_ids = 2;
+}
+
+message ChannelTopicRequest {
+  common.Identity identity = 1;
+
+  string channel_id = 2;
+}
+
+message ChannelTopicResponse {
+  string channel_id = 1;
+  string topic = 2;
+}
+
+message SetChannelTopicRequest {
+  common.Identity identity = 1;
+
+  string channel_id = 2;
+  string topic = 3;
+}
+
+message SetChannelTopicResponse {}
+
+service SeabirdChatService {
+  rpc JoinChannel(JoinChannelRequest) returns (JoinChannelResponse);
+  rpc LeaveChannel(LeaveChannelRequest) returns (LeaveChannelResponse);
+
+  // TODO: between this and the Core API figure out how to track users
+  rpc ListChannelUsers(ListChannelUsersRequest) returns (ListChannelUsersResponse);
+
+  rpc GetChannelTopic(ChannelTopicRequest) returns (ChannelTopicResponse);
+  rpc SetChannelTopic(SetChannelTopicRequest) returns (SetChannelTopicResponse);
+
+  rpc Heartbeat(common.HeartbeatRequest) returns (common.HeartbeatResponse);
+}
