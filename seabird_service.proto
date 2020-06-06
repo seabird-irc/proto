@@ -10,10 +10,11 @@ message RegisterRequest {
   common.Identity identity = 1;
 
   string id = 2;
-  repeated string supported_actions = 3;
+  string name = 3;
+  repeated string supported_actions = 4;
   // TODO: decide if this is worth the weirdness to
   // save the extra RPC
-  repeated string initial_channels = 4;
+  repeated string initial_channels = 5;
 }
 
 message RegisterResponse {}
