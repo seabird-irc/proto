@@ -6,15 +6,35 @@ import "common.proto";
 
 package seabird_chat_router;
 
+message JoinChannelEvent {
+  string channel_name = 1;
+}
+
+message LeaveChannelEvent {
+  string channel_id = 1;
+}
+
+message ChatEvent {
+  oneof inner {
+    common.MessageEvent text = 1;
+    common.PrivateMessageEvent private_message = 2;
+    common.MentionEvent mention = 3;
+    common.CommandEvent command = 4;
+
+    JoinChannelEvent join_channel = 5;
+    LeaveChannelEvent leave_channel = 6;
+  }
+}
+
 message RegisterRequest {
   common.Identity identity = 1;
 
-  string id = 2;
-  string name = 3;
-  repeated string supported_actions = 4;
+  string name = 2;
+  repeated string supported_actions = 3;
+
   // TODO: decide if this is worth the weirdness to
   // save the extra RPC
-  repeated string initial_channels = 5;
+  repeated string initial_channels = 4;
 }
 
 message RegisterResponse {}
@@ -22,13 +42,34 @@ message RegisterResponse {}
 message RegisterChannelsRequest {
   common.Identity identity = 1;
 
-  // Note that "service_id" here is expected to be optional
-  // as the message is coming from the service registering
-  // registering the channels.
-  repeated common.Channel channels = 2;
+  repeated string channel_names = 2;
 }
 
-message RegisterChannelsResponse {}
+message RegisterChannelsResponse {
+  // Should the chat service maintain IDs as well?
+  // It'd be more convenient for Core to not maintain
+  // mappings of names to IDs and push that down
+  // to the chat service, but the downside is that
+  // then the chat service needs to keep a consistent
+  // map of the IDs as well, which need to be kept in-
+  // sync with Core.
+  //
+  // Instead, we could make Core and plugins the only
+  // things that know about IDs, and then Core would
+  // take IDs from plugins and switch them out
+  // for the channel names that services know about.
+  // More work for core, but much more convenient for
+  // chat services. I believe that the IDs are still
+  // necessary as otherwise you couldn't have either
+  // (a) multiple services with the same channel names
+  // without exposing the service ID as well, or more
+  // importantly (b) two instances of the same service
+  // (two Discord servers for example) with the same
+  // channel names in each. Technically you could
+  // also get around that by populating server IDs in
+  // each request, but that seems a bit dirty API-wise.
+  repeated common.Channel channels = 1;
+}
 
 message DeregisterChannelsRequest {
   common.Identity identity = 1;
@@ -62,9 +103,7 @@ service SeabirdChatRouter {
   rpc RegisterChannels(RegisterChannelRequest) returns (RegisterChannelResponse);
   rpc DeregisterChannels(DeregisterChannelRequest) returns (DeregisterChannelResponse);
 
-  rpc StreamEvents(StreamEventsRequest) returns (stream common.Event);
+  rpc StreamEvents(StreamEventsRequest) returns (stream ChatEvent);
 
   rpc DispatchMessage(DispatchMessageRequest) returns (DispatchMessageResponse);
-
-  rpc Heartbeat(common.HeartbeatRequest) returns (common.HeartbeatResponse);
 }
