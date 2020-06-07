@@ -6,46 +6,32 @@ package seabird;
 
 import "common.proto";
 
-// Base objects are split into two pieces - their identifier and info
-// components. The info objects embed the identifier to make them easier to send
-// in responses.
+// Note that the IDs exposed by the Service, User, and Channel are compound IDs
+// which seabird-core will parse and route to the correct location.
 
 message Service {
   string id = 1;
-}
-
-message ServiceInfo {
-  Service service = 1;
   string type = 2;
 }
 
 message User {
-  string service_id = 1;
-  string user_id = 2;
-}
-
-message UserInfo {
-  User user = 1;
+  string id = 1;
   string name = 2;
 }
 
 message Channel {
-  string service_id = 1;
-  string channel_id = 2;
-}
-
-message ChannelInfo {
-  Channel channel = 1;
+  string id = 1;
   string name = 2;
   string topic = 3;
 }
 
-// Where a message came from. Note that UserInfo is used rather than User so any
-// clients can have access to the name as well. This may change in the future.
+// Where a message came from. Note that User is used rather than just an ID so
+// any clients can have access to the name as well. This may change in the
+// future.
 
 message ChannelSource {
-  UserInfo sender = 1;
-  Channel channel = 2;
+  User user = 1;
+  string channel_id = 2;
 }
 
 // Events
@@ -73,7 +59,7 @@ message CommandEvent {
 
 message Event {
   oneof inner {
-    MessageEvent text = 1;
+    MessageEvent message = 1;
     PrivateMessageEvent private_message = 2;
     MentionEvent mention = 3;
     CommandEvent command = 4;
@@ -99,7 +85,7 @@ message SendMessageRequest {
   common.Identity identity = 1;
 
   Channel channel = 2;
-  string message = 3;
+  string text = 3;
 }
 
 message SendMessageResponse {}
@@ -107,8 +93,8 @@ message SendMessageResponse {}
 message SendPrivateMessageRequest {
   common.Identity identity = 1;
 
-  User user = 2;
-  string message = 3;
+  string user_id = 2;
+  string text = 3;
 }
 
 message SendPrivateMessageResponse {}
@@ -117,6 +103,8 @@ message JoinChannelRequest {
   common.Identity identity = 1;
 
   string server_id = 2;
+
+  // NOTE: this channel_name is the only place name is used for an identifier -
   string channel_name = 3;
 }
 
@@ -125,7 +113,7 @@ message JoinChannelResponse {}
 message LeaveChannelRequest {
   common.Identity identity = 1;
 
-  Channel channel = 2;
+  string channel_id = 2;
   string exit_message = 3;
 }
 
@@ -146,17 +134,13 @@ message ListChannelsRequest {
 }
 
 message ListChannelsResponse {
-  repeated Channel channels = 1;
+  repeated string channel_ids = 1;
 }
 
 message ChannelInfoRequest {
   common.Identity identity = 1;
 
-  Channel channel = 2;
-}
-
-message ChannelInfoResponse {
-  ChannelInfo info = 1;
+  string channel_id = 2;
 }
 
 message SetChannelTopicRequest {
@@ -185,14 +169,14 @@ service Seabird {
   rpc SendPrivateMessage(SendPrivateMessageRequest) returns (SendPrivateMessageResponse);
   rpc JoinChannel(JoinChannelRequest) returns (JoinChannelResponse);
   rpc LeaveChannel(LeaveChannelRequest) returns (LeaveChannelResponse);
+  rpc SetChannelTopic(SetChannelTopicRequest) returns (SetChannelTopicResponse);
 
   // Chat service introspection
   rpc ListServices(ListServicesRequest) returns (ListServicesResponse);
 
   // Chat connection introspection
   rpc ListChannels(ListChannelsRequest) returns (ListChannelsResponse);
-  rpc GetChannelInfo(ChannelInfoRequest) returns (ChannelInfoResponse);
-  rpc SetChannelTopic(SetChannelTopicRequest) returns (SetChannelTopicResponse);
+  rpc GetChannelInfo(ChannelInfoRequest) returns (Channel);
 
   // Seabird introspection
   rpc GetCoreInfo(CoreInfoRequest) returns (CoreInfoResponse);

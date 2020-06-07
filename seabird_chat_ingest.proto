@@ -6,6 +6,10 @@ import "common.proto";
 
 package seabird;
 
+// Note that all of the types in this file end with ChatRequest, end with
+// ChatEvent, or start with Chat to prevent namespace conflicts between the main
+// seabird.proto.
+
 message ChatUser {
   string id = 1;
   string name = 2;
@@ -14,17 +18,6 @@ message ChatUser {
 message ChatChannel {
   string id = 1;
   string name = 2;
-}
-
-// When a chat service receives a PingChatRequest, it MUST respond with a
-// PongChatEvent containing the copied nonce.
-message PingChatRequest {
-  string nonce = 1;
-}
-
-// PongChatRequest will be sent in response to a PingChatEvent.
-message PongChatRequest {
-  string nonce = 1;
 }
 
 message SendMessageChatRequest {
@@ -58,13 +51,11 @@ message ChatRequest {
   string id = 1;
 
   oneof inner {
-    PingChatRequest ping = 2;
-    PongChatRequest pong = 3;
-    SendMessageChatRequest send_message = 4;
-    SendPrivateMessageChatRequest send_private_message = 5;
-    JoinChannelChatRequest join_channel = 6;
-    LeaveChannelChatRequest leave_channel = 7;
-    SetChannelTopicChatRequest set_channel_topic = 8;
+    SendMessageChatRequest send_message = 2;
+    SendPrivateMessageChatRequest send_private_message = 3;
+    JoinChannelChatRequest join_channel = 4;
+    LeaveChannelChatRequest leave_channel = 5;
+    SetChannelTopicChatRequest set_channel_topic = 6;
   }
 }
 
@@ -74,24 +65,7 @@ message HelloChatEvent {
   common.Identity identity = 1;
 }
 
-// PingChatEvent is an optional event which may be sent by the chat service to
-// test latency to seabird-core. When a ping event is sent, seabird-core will
-// respond with a PongChatRequest. The nonce sent with the ping will be returned
-// in the pong.
-message PingChatEvent {
-  string nonce = 1;
-}
-
-// PongChatEvent is a required event which must be sent by the chat service
-// after receiving a PingChatRequest from seabird-core. This is used by
-// seabird-core to test latency to chat services.
-//
-// Note that if a chat backend connects to a service which implements a
-// PING/PONG system similar to seabird, it may be worthwhile to test the full
-// round trip or at least check the latency there as well.
-message PongChatEvent {
-  string nonce = 1;
-}
+message SuccessChatEvent {}
 
 // This is a marker event to respond to seabird-core that performing an action
 // has failed. Note that an action which takes too long will also be marked as
@@ -131,28 +105,40 @@ message ChannelTopicChatEvent {
   string topic = 2;
 }
 
+message ChannelJoinEvent {
+  ChatChannel channel = 1;
+}
+
+message ChannelLeaveEvent {
+  ChatChannel channel = 1;
+}
+
 // ChatEvent contains all the different event types a chat backend can emit.
 // Note that these are slightly different to the seabird.Event types as channels
 // here will not be mapped to UUIDs and some events are only to support the data
 // that seabird-core tracks.
 //
-// HelloChatEvent and PongChatEvent are the only two message types that are
-// required for a chat backend to work.
+// HelloChatEvent is the only message type that is required for a chat backend
+// to work.
 message ChatEvent {
   string id = 1;
+
   oneof inner {
     // Seabird-internal event types
     HelloChatEvent hello = 2;
-    PingChatEvent ping = 3;
-    PongChatEvent pong = 4;
-    FailedChatEvent failed = 5;
+    SuccessChatEvent success = 3;
+    FailedChatEvent failed = 4;
 
     // Messages from the service
-    MessageChatEvent message = 6;
-    PrivateMessageChatEvent private_message = 7;
-    MentionChatEvent mention = 8;
-    CommandChatEvent command = 9;
-    ChannelTopicChatEvent topic = 10;
+    MessageChatEvent message = 5;
+    PrivateMessageChatEvent private_message = 6;
+    MentionChatEvent mention = 7;
+    CommandChatEvent command = 8;
+    ChannelTopicChatEvent topic = 9;
+
+    // Channel changes
+    ChannelJoinEvent join = 10;
+    ChannelLeaveEvent leave = 11;
   }
 }
 
@@ -160,5 +146,5 @@ message ChatEvent {
 // allow multiple different chat backends to register to Core and allow plugins
 // to communicate with them.
 service ChatIngest {
-  rpc IngestEvents(stream ChatRequest) returns (stream ChatEvent);
+  rpc IngestEvents(stream ChatEvent) returns (stream ChatRequest);
 }
