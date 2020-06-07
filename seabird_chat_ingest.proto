@@ -12,12 +12,12 @@ package seabird;
 
 message ChatUser {
   string id = 1;
-  string name = 2;
+  string display_name = 2;
 }
 
 message ChatChannel {
   string id = 1;
-  string name = 2;
+  string display_name = 2;
 }
 
 message SendMessageChatRequest {
@@ -38,8 +38,8 @@ message LeaveChannelChatRequest {
   string channel_id = 1;
 }
 
-message SetChannelTopicChatRequest {
-  string channel = 1;
+message SetTopicChannelChatRequest {
+  string channel_id = 1;
   string topic = 2;
 }
 
@@ -55,7 +55,7 @@ message ChatRequest {
     SendPrivateMessageChatRequest send_private_message = 3;
     JoinChannelChatRequest join_channel = 4;
     LeaveChannelChatRequest leave_channel = 5;
-    SetChannelTopicChatRequest set_channel_topic = 6;
+    SetTopicChannelChatRequest set_channel_topic = 6;
   }
 }
 

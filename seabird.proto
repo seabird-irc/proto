@@ -16,12 +16,12 @@ message Service {
 
 message User {
   string id = 1;
-  string name = 2;
+  string display_name = 2;
 }
 
 message Channel {
   string id = 1;
-  string name = 2;
+  string display_name = 2;
   string topic = 3;
 }
 
