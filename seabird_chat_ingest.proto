@@ -4,7 +4,7 @@ option go_package = ".;pb";
 
 import "common.proto";
 
-package seabird_chat_ingest;
+package seabird;
 
 message ChatUser {
   string id = 1;
@@ -159,6 +159,6 @@ message ChatEvent {
 // This service is exposed separately to the chat frontend. Its purpose is to
 // allow multiple different chat backends to register to Core and allow plugins
 // to communicate with them.
-service SeabirdChatIngest {
+service ChatIngest {
   rpc IngestEvents(stream ChatRequest) returns (stream ChatEvent);
 }
