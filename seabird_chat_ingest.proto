@@ -1,0 +1,164 @@
+syntax = "proto3";
+
+option go_package = ".;pb";
+
+import "common.proto";
+
+package seabird_chat_ingest;
+
+message ChatUser {
+  string id = 1;
+  string name = 2;
+}
+
+message ChatChannel {
+  string id = 1;
+  string name = 2;
+}
+
+// When a chat service receives a PingChatRequest, it MUST respond with a
+// PongChatEvent containing the copied nonce.
+message PingChatRequest {
+  string nonce = 1;
+}
+
+// PongChatRequest will be sent in response to a PingChatEvent.
+message PongChatRequest {
+  string nonce = 1;
+}
+
+message SendMessageChatRequest {
+  string channel_id = 1;
+  string message = 2;
+}
+
+message SendPrivateMessageChatRequest {
+  string user_id = 1;
+  string message = 2;
+}
+
+message JoinChannelChatRequest {
+  string channel_name = 1;
+}
+
+message LeaveChannelChatRequest {
+  string channel_id = 1;
+}
+
+message SetChannelTopicChatRequest {
+  string channel = 1;
+  string topic = 2;
+}
+
+// Each ChatRequest has an ID (which can be attached to outgoing events - only
+// the first outgoing event with this ID will be used as the reply) and an inner
+// message type. Having an ID allows us to route an event back to the requestor
+// without having the chat backend implement a service.
+message ChatRequest {
+  string id = 1;
+
+  oneof inner {
+    PingChatRequest ping = 2;
+    PongChatRequest pong = 3;
+    SendMessageChatRequest send_message = 4;
+    SendPrivateMessageChatRequest send_private_message = 5;
+    JoinChannelChatRequest join_channel = 6;
+    LeaveChannelChatRequest leave_channel = 7;
+    SetChannelTopicChatRequest set_channel_topic = 8;
+  }
+}
+
+// HelloChatEvent must be the first event sent by the chat backend. If a different
+// event is sent, the connection will be closed.
+message HelloChatEvent {
+  common.Identity identity = 1;
+}
+
+// PingChatEvent is an optional event which may be sent by the chat service to
+// test latency to seabird-core. When a ping event is sent, seabird-core will
+// respond with a PongChatRequest. The nonce sent with the ping will be returned
+// in the pong.
+message PingChatEvent {
+  string nonce = 1;
+}
+
+// PongChatEvent is a required event which must be sent by the chat service
+// after receiving a PingChatRequest from seabird-core. This is used by
+// seabird-core to test latency to chat services.
+//
+// Note that if a chat backend connects to a service which implements a
+// PING/PONG system similar to seabird, it may be worthwhile to test the full
+// round trip or at least check the latency there as well.
+message PongChatEvent {
+  string nonce = 1;
+}
+
+// This is a marker event to respond to seabird-core that performing an action
+// has failed. Note that an action which takes too long will also be marked as
+// failed automatically. The time alotted for an action is not static and may
+// change based on load.
+message FailedChatEvent {
+  string reason = 1;
+}
+
+message MessageChatEvent {
+  ChatUser user = 1;
+  ChatChannel channel = 2;
+  string message = 3;
+}
+
+message PrivateMessageChatEvent {
+  ChatUser user = 1;
+  ChatChannel channel = 2;
+  string message = 3;
+}
+
+message MentionChatEvent {
+  ChatUser user = 1;
+  ChatChannel channel = 2;
+  string message = 3;
+}
+
+message CommandChatEvent {
+  ChatUser user = 1;
+  ChatChannel channel = 2;
+  string command = 3;
+  string arg = 4;
+}
+
+message ChannelTopicChatEvent {
+  ChatChannel channel = 1;
+  string topic = 2;
+}
+
+// ChatEvent contains all the different event types a chat backend can emit.
+// Note that these are slightly different to the seabird.Event types as channels
+// here will not be mapped to UUIDs and some events are only to support the data
+// that seabird-core tracks.
+//
+// HelloChatEvent and PongChatEvent are the only two message types that are
+// required for a chat backend to work.
+message ChatEvent {
+  string id = 1;
+  oneof inner {
+    // Seabird-internal event types
+    HelloChatEvent hello = 2;
+    PingChatEvent ping = 3;
+    PongChatEvent pong = 4;
+    FailedChatEvent failed = 5;
+
+    // Messages from the service
+    MessageChatEvent message = 6;
+    PrivateMessageChatEvent private_message = 7;
+    MentionChatEvent mention = 8;
+    CommandChatEvent command = 9;
+    ChannelTopicChatEvent topic = 10;
+  }
+}
+
+// This service is exposed separately to the chat frontend. Its purpose is to
+// allow multiple different chat backends to register to Core and allow plugins
+// to communicate with them.
+service SeabirdChatIngest {
+  rpc StreamEvents(stream ChatRequest) returns (stream ChatEvent);
+}

@@ -6,6 +6,82 @@ package seabird;
 
 import "common.proto";
 
+// Base objects are split into two pieces - their identifier and info
+// components. The info objects embed the identifier to make them easier to send
+// in responses.
+
+message Service {
+  string id = 1;
+}
+
+message ServiceInfo {
+  Service service = 1;
+  string type = 2;
+}
+
+message User {
+  string service_id = 1;
+  string user_id = 2;
+}
+
+message UserInfo {
+  User user = 1;
+  string name = 2;
+}
+
+message Channel {
+  string service_id = 1;
+  string channel_id = 2;
+}
+
+message ChannelInfo {
+  Channel channel = 1;
+  string name = 2;
+  string topic = 3;
+}
+
+// Where a message came from. Note that UserInfo is used rather than User so any
+// clients can have access to the name as well. This may change in the future.
+
+message ChannelSource {
+  UserInfo sender = 1;
+  Channel channel = 2;
+}
+
+// Events
+
+message MessageEvent {
+  ChannelSource source = 1;
+  string text = 2;
+}
+
+message PrivateMessageEvent {
+  User source = 1;
+  string text = 2;
+}
+
+message MentionEvent {
+  ChannelSource source = 1;
+  string text = 2;
+}
+
+message CommandEvent {
+  ChannelSource source = 1;
+  string command = 2;
+  string arg = 3;
+}
+
+message Event {
+  oneof inner {
+    MessageEvent text = 1;
+    PrivateMessageEvent private_message = 2;
+    MentionEvent mention = 3;
+    CommandEvent command = 4;
+  }
+}
+
+// Request and response objects
+
 message StreamEventsRequest {
   common.Identity identity = 1;
 
@@ -21,50 +97,20 @@ message CommandMetadata {
 message SendMessageRequest {
   common.Identity identity = 1;
 
-  string destination_id = 2;
-  string text = 3;
+  Channel channel = 2;
+  string message = 3;
 }
 
 message SendMessageResponse {}
 
-message ListServicesRequest {
-  common.Identity identity = 1;
-}
-
-message ListServicesResponse {
-  repeated common.Service services = 1;
-}
-
-message ListChannelsRequest {
-  common.Identity identity = 1;
-  string service_id = 2;
-}
-
-message ListChannelsResponse {
-  repeated common.Channel channels = 1;
-}
-
-message ChannelInfoRequest {
+message SendPrivateMessageRequest {
   common.Identity identity = 1;
 
-  string channel_id = 2;
+  User user = 2;
+  string message = 3;
 }
 
-message ChannelInfoResponse {
-  string id = 1;
-  string name = 2;
-  string topic = 3;
-  repeated common.User users = 4;
-}
-
-message SetChannelTopicRequest {
-  common.Identity identity = 1;
-
-  string channel_id = 2;
-  string topic = 3;
-}
-
-message SetChannelTopicResponse {}
+message SendPrivateMessageResponse {}
 
 message JoinChannelRequest {
   common.Identity identity = 1;
@@ -78,35 +124,48 @@ message JoinChannelResponse {}
 message LeaveChannelRequest {
   common.Identity identity = 1;
 
-  string channel_id = 2;
+  Channel channel = 2;
   string exit_message = 3;
 }
 
 message LeaveChannelResponse {}
 
-message ListStreamsRequest {
+message ListServicesRequest {
   common.Identity identity = 1;
 }
 
-message ListStreamsResponse {
-  repeated string stream_ids = 1;
+message ListServicesResponse {
+  repeated Service service = 1;
 }
 
-message StreamInfoRequest {
+message ListChannelsRequest {
   common.Identity identity = 1;
 
-  string stream_id = 2;
+  Service service = 2;
 }
 
-message StreamInfoResponse {
-  string id = 1;
-  string tag = 2;
-
-  map<string, CommandMetadata> commands = 3;
-
-  string remote_address = 4;
-  int64 connection_timestamp = 5;
+message ListChannelsResponse {
+  repeated Channel channels = 1;
 }
+
+message ChannelInfoRequest {
+  common.Identity identity = 1;
+
+  Channel channel = 2;
+}
+
+message ChannelInfoResponse {
+  ChannelInfo info = 1;
+}
+
+message SetChannelTopicRequest {
+  common.Identity identity = 1;
+
+  Channel channel = 2;
+  string topic = 3;
+}
+
+message SetChannelTopicResponse {}
 
 message CoreInfoRequest {
   common.Identity identity = 1;
@@ -118,12 +177,16 @@ message CoreInfoResponse {
 }
 
 service Seabird {
-  rpc StreamEvents(StreamEventsRequest) returns (stream common.Event);
+  rpc StreamEvents(StreamEventsRequest) returns (stream Event);
 
   // Chat actions
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+  rpc SendPrivateMessage(SendPrivateMessageRequest) returns (SendPrivateMessageResponse);
   rpc JoinChannel(JoinChannelRequest) returns (JoinChannelResponse);
   rpc LeaveChannel(LeaveChannelRequest) returns (LeaveChannelResponse);
+
+  // Chat service introspection
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse);
 
   // Chat connection introspection
   rpc ListChannels(ListChannelsRequest) returns (ListChannelsResponse);
@@ -131,7 +194,5 @@ service Seabird {
   rpc SetChannelTopic(SetChannelTopicRequest) returns (SetChannelTopicResponse);
 
   // Seabird introspection
-  rpc ListStreams(ListStreamsRequest) returns (ListStreamsResponse);
-  rpc GetStreamInfo(StreamInfoRequest) returns (StreamInfoResponse);
   rpc GetCoreInfo(CoreInfoRequest) returns (CoreInfoResponse);
 }
