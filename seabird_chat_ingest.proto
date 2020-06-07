@@ -160,5 +160,5 @@ message ChatEvent {
 // allow multiple different chat backends to register to Core and allow plugins
 // to communicate with them.
 service SeabirdChatIngest {
-  rpc StreamEvents(stream ChatRequest) returns (stream ChatEvent);
+  rpc IngestEvents(stream ChatRequest) returns (stream ChatEvent);
 }
