@@ -85,6 +85,7 @@ message Event {
 message StreamEventsRequest {
   common.Identity identity = 1;
 
+  // NOTE: help is a reserved command and cannot be registered by plugins.
   map<string, CommandMetadata> commands = 2;
 }
 
