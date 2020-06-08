@@ -14,18 +14,15 @@ This project moves Seabird plugins from the same process as Seabird proper out i
 
 3. This setup allows for testing plugin instances against the production version of the `core`.
 
-## Isn't this a bad idea? I mean, this is just an IRC bot.
+## Isn't this a bad idea? I mean, this is just a chat bot.
 
 Yes, for the following reasons:
 
-1. This setup is more complicated in code than the existing system of one-thread-per-plugin.
-The setup forces us to think about failure scenarios that aren’t present in a single-process architecture. We also need to expose a more fully featured API from `core` in order to properly support tracking useful information.
+1. This setup is more complicated in code than the existing system of one-thread-per-plugin. The setup forces us to think about failure scenarios that aren’t present in a single-process architecture. We also need to expose a more fully featured API from `core` in order to properly support tracking useful information.
 
-2. This setup is more complicated to run than the existing system.
-We need to make sure to have a good README and wikis as necessary to set this up properly. Perhaps we should also have Dockerfiles and/or setup scripts.
+2. This setup is more complicated to run than the existing system. We need to make sure to have a good README and wikis as necessary to set this up properly. Perhaps we should also have Dockerfiles and/or setup scripts.
 
-3. The database connection cannot easily be shared
-Because of this, each plugin will need to maintain their own connection to the database if they need it.
+3. The database connection cannot easily be shared. Because of this, each plugin will need to maintain their own connection to the database if they need it.
 
 ## Client connection information
 
@@ -33,7 +30,7 @@ Each gRPC request contains an Identity as the first field. This should be constr
 
 ## What is "core"?
 
-`core` is the core process that maintains a connection to a given IRC server. It's the server on the other end of the gRPC connection.
+`core` is the main process and service implementation that acts as a broker for chat messages. It's the server on the other end of the gRPC connection.
 
 ## As a client, what can I expect from core?
 
@@ -53,7 +50,7 @@ Yes. Additionally, there is no limitation on opened event streams by clients.
 
 Unfortunately, this is under active development and still fairly clunky, but if you really want to get involved you're welcome to!
 
-You'll need at a minimum a running instance of [core](https://github.com/seabird-irc/seabird-core). From there, you may clone various plugin repositories as desired and configure them to connect to `core`.
+At a minimum, you'll need a running instance of [core](https://github.com/seabird-irc/seabird-core). From there, you may clone various plugin repositories as desired and configure them to connect to `core`.
 
 ## License
 

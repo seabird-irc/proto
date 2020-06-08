@@ -12,3 +12,67 @@ message Identity {
     string token = 1;
   }
 }
+
+// When sent by a chat backend, the ID MAY optionally be used as a hint to the
+// frontend to get the same external ID on reconnection. When sent by core to a
+// plugin, the ID MUST be an ID pointing to an exact backend instance.
+message Backend {
+  string id = 1;
+  string type = 2;
+}
+
+// When sent by a chat backend, the ID MUST be a unique ID representing this
+// user in the given chat service. When sent by core to a plugin, the ID MUST be
+// an ID pointing to an instance of a user on a service.
+message User {
+  string id = 1;
+  string display_name = 2;
+}
+
+// When sent by a chat backend, the ID MUST be a unique ID representing this
+// channel in the given chat service. When sent by core to a plugin, the ID MUST
+// be an ID pointing to an instance of a channel on a service.
+message Channel {
+  string id = 1;
+  string display_name = 2;
+  string topic = 3;
+}
+
+// ChannelSource represents where a message came from. Note that User is used
+// rather than just an ID so any clients can have access to the name as well.
+// This may change in the future.
+message ChannelSource {
+  User user = 1;
+  string channel_id = 2;
+}
+
+// Common Events
+
+// MessageEvent will be sent when a user sends a message to a channel.
+message MessageEvent {
+  ChannelSource source = 1;
+  string text = 2;
+}
+
+// PrivateMessageEvent will be sent when a user sends a message directly to the
+// chat backend.
+message PrivateMessageEvent {
+  common.User source = 1;
+  string text = 2;
+}
+
+// MentionEvent will be sent when a user mentions the chat backend at the start
+// of a message in a channel. Note that this may eventually go away when a more
+// general message format is developed.
+message MentionEvent {
+  ChannelSource source = 1;
+  string text = 2;
+}
+
+// CommandEvent will be sent when a user issues a command in a channel. Commands
+// cannot be issued via private message.
+message CommandEvent {
+  ChannelSource source = 1;
+  string command = 2;
+  string arg = 3;
+}
