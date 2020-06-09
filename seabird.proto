@@ -145,8 +145,7 @@ message CoreInfoRequest {
 
 // Metadata about the running core instance.
 message CoreInfoResponse {
-  string current_nick = 1;
-  int64 startup_timestamp = 2;
+  int64 startup_timestamp = 1;
 }
 
 service Seabird {
