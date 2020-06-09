@@ -11,8 +11,8 @@ package seabird;
 
 // SendMessageChatRequest requests for a message to be sent to a given channel.
 // Either SuccessChatEvent or FailedChatEvent SHOULD be returned in response if
-// possible. This MUST NOT cause any chat events from the bot to appear in the
-// output event stream.
+// possible. The MessageEvent written to the chat backend's connection MUST NOT
+// also be sent to the chat backend's event stream.
 message SendMessageChatRequest {
   string channel_id = 1;
   string message = 2;
@@ -20,8 +20,8 @@ message SendMessageChatRequest {
 
 // SendPrivateMessageChatRequest requests for a message to be sent to a given
 // user. Either SuccessChatEvent or FailedChatEvent SHOULD be returned in
-// response if possible. This MUST NOT cause any chat events from the bot to
-// appear in the output event stream.
+// response if possible. The PrivateMessageEvent written to the chat backend's
+// connection MUST NOT also be sent to the chat backend's event stream.
 message SendPrivateMessageChatRequest {
   string user_id = 1;
   string message = 2;
@@ -49,10 +49,12 @@ message UpdateChannelChatRequest {
   string topic = 2;
 }
 
-// Each ChatRequest has an ID (which can be attached to outgoing events - only
-// the first outgoing event with this ID will be used as the reply) and an inner
-// message type. Having an ID allows us to route an event back to the requestor
-// without having the chat backend implement a service.
+// Each ChatRequest has an ID (which can be attached to requests coming from
+// core) and an inner message type. Having an ID allows us to route an event
+// back to the requestor without having the chat backend implement a service.
+//
+// When a request does not get a response, the action may still happen and be
+// sent to the event stream, but the plugin may receive a timed out request.
 message ChatRequest {
   string id = 1;
 

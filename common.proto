@@ -63,9 +63,9 @@ message PrivateMessageEvent {
   string text = 2;
 }
 
-// MentionEvent will be sent when a user mentions the chat backend at the start
-// of a message in a channel. Note that this may eventually go away when a more
-// general message format is developed.
+// MentionEvent will be sent when a user mentions the chat backend's user at the
+// start of a message in a channel. Note that this may eventually go away when a
+// more general message format is developed.
 message MentionEvent {
   ChannelSource source = 1;
   string text = 2;

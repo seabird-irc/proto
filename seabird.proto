@@ -34,6 +34,10 @@ message StreamEventsRequest {
 
 // CommandMetadata groups together a command's name along with short in-line
 // help and the full private help.
+//
+// An example for the "help" command might be a name of "help", a short_help of
+// "<command>" and an long help of "With no arguments, lists all available
+// commands. With an argument, display the long help for an item."
 message CommandMetadata {
   string name = 1;
   string short_help = 2;
