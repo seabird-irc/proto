@@ -50,7 +50,7 @@ Yes. Additionally, there is no limitation on opened event streams by clients.
 
 Unfortunately, this is under active development and still fairly clunky, but if you really want to get involved you're welcome to!
 
-At a minimum, you'll need a running instance of [core](https://github.com/seabird-irc/seabird-core). From there, you may clone various plugin repositories as desired and configure them to connect to `core`.
+At a minimum, you'll need a running instance of [core](https://github.com/seabird-irc/seabird-core) and at least one running chat backend. From there, you may clone various plugin repositories as desired and configure them to connect to `core`.
 
 ## License
 

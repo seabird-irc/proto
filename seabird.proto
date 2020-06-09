@@ -6,8 +6,8 @@ package seabird;
 
 import "common.proto";
 
-// Note that the IDs exposed by the Service, User, and Channel are compound IDs
-// which seabird-core will parse and route to the correct location.
+// Note that the IDs exposed by the Backend, User, and Channel are opaque IDs
+// which seabird-core will handle and route to the correct backend.
 
 message Event {
   oneof inner {
@@ -25,7 +25,8 @@ message StreamEventsRequest {
 
   // A registry of commands this plugin responds to. A plugin MUST register all
   // commands it responds to in order to receive those events. The
-  // CommandMetadata's name MUST match the map key.
+  // CommandMetadata's name MUST match the map key, or an error will be
+  // returned.
   //
   // NOTE: help is a reserved command and cannot be registered by plugins.
   map<string, CommandMetadata> commands = 2;
@@ -68,6 +69,7 @@ message JoinChannelRequest {
   string server_id = 2;
 
   // NOTE: this channel_name is the only place name is used for an identifier -
+  // all other times channels will be referred to by ID.
   string channel_name = 3;
 }
 

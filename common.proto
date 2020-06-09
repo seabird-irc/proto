@@ -5,8 +5,8 @@ option go_package = ".;pb";
 package common;
 
 // Identity is included in every message that requires auth. One AuthMethod at a
-// time is supported. For now, the only supported method is a token. These need
-// to be created manually and distributed to any clients.
+// time is supported. For now, the only supported method is a token. These
+// tokens need to be created manually and distributed to any clients.
 message Identity {
   oneof AuthMethod {
     string token = 1;
@@ -21,17 +21,19 @@ message Backend {
   string type = 2;
 }
 
-// When sent by a chat backend, the ID MUST be a unique ID representing this
-// user in the given chat service. When sent by core to a plugin, the ID MUST be
-// an ID pointing to an instance of a user on a service.
+// When sent by a chat backend, the ID MUST be unique per users in that running
+// backend. Failure to follow this will result in incorrect information being
+// sent to plugins. When sent by core to a plugin, the ID MUST be an ID pointing
+// to an instance of a user on a service.
 message User {
   string id = 1;
   string display_name = 2;
 }
 
-// When sent by a chat backend, the ID MUST be a unique ID representing this
-// channel in the given chat service. When sent by core to a plugin, the ID MUST
-// be an ID pointing to an instance of a channel on a service.
+// When sent by a chat backend, the ID MUST be unique per channels in that
+// running backend. Failure to follow this will result in incorrect information
+// being sent to plugins. When sent by core to a plugin, the ID MUST be an ID
+// pointing to an instance of a channel on a service.
 message Channel {
   string id = 1;
   string display_name = 2;
@@ -42,8 +44,8 @@ message Channel {
 // rather than just an ID so any clients can have access to the name as well.
 // This may change in the future.
 message ChannelSource {
-  User user = 1;
-  string channel_id = 2;
+  string channel_id = 1;
+  User user = 2;
 }
 
 // Common Events
@@ -70,7 +72,8 @@ message MentionEvent {
 }
 
 // CommandEvent will be sent when a user issues a command in a channel. Commands
-// cannot be issued via private message.
+// cannot be issued via private message. If a message is parsed as a command, it
+// SHOULD NOT be sent as another message type.
 message CommandEvent {
   ChannelSource source = 1;
   string command = 2;
