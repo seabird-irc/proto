@@ -121,7 +121,7 @@ message ChangeChannelEvent {
 // HelloChatEvent is the only message type that is required for a chat backend
 // to work.
 //
-// Core may be configured with both time and load-based request failure
+// Core may be configured with both time-based and load-based request failure
 // mechanisms. It can fail any action and serve that as an error to plugins. If
 // an ID is included which has timed out in core or otherwise does not exist, it
 // will be ignored.

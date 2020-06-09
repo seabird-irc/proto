@@ -21,19 +21,19 @@ message Backend {
   string type = 2;
 }
 
-// When sent by a chat backend, the ID MUST be unique per users in that running
+// When sent by a chat backend, the ID MUST be unique across users in that running
 // backend. Failure to follow this will result in incorrect information being
 // sent to plugins. When sent by core to a plugin, the ID MUST be an ID pointing
-// to an instance of a user on a service.
+// to an instance of a user on chat backend.
 message User {
   string id = 1;
   string display_name = 2;
 }
 
-// When sent by a chat backend, the ID MUST be unique per channels in that
+// When sent by a chat backend, the ID MUST be unique across channels in that
 // running backend. Failure to follow this will result in incorrect information
 // being sent to plugins. When sent by core to a plugin, the ID MUST be an ID
-// pointing to an instance of a channel on a service.
+// pointing to an instance of a channel on chat backend.
 message Channel {
   string id = 1;
   string display_name = 2;
@@ -73,7 +73,7 @@ message MentionEvent {
 
 // CommandEvent will be sent when a user issues a command in a channel. Commands
 // cannot be issued via private message. If a message is parsed as a command, it
-// SHOULD NOT be sent as another message type.
+// MUST NOT be also sent as another message type.
 message CommandEvent {
   ChannelSource source = 1;
   string command = 2;
