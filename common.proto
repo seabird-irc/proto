@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+option go_package = ".;pb";
+
+package common;
+
+// Identity is included in every message that requires auth. One AuthMethod at a
+// time is supported. For now, the only supported method is a token. These
+// tokens need to be created manually and distributed to any clients.
+message Identity {
+  oneof AuthMethod {
+    string token = 1;
+  }
+}
+
+// When sent by a chat backend, the ID MAY optionally be used as a hint to the
+// frontend to get the same external ID on reconnection. When sent by core to a
+// plugin, the ID MUST be an ID pointing to an exact backend instance.
+message Backend {
+  string id = 1;
+  string type = 2;
+}
+
+// When sent by a chat backend, the ID MUST be unique across users in that running
+// backend. Failure to follow this will result in incorrect information being
+// sent to plugins. When sent by core to a plugin, the ID MUST be an ID pointing
+// to an instance of a user on chat backend.
+message User {
+  string id = 1;
+  string display_name = 2;
+}
+
+// When sent by a chat backend, the ID MUST be unique across channels in that
+// running backend. Failure to follow this will result in incorrect information
+// being sent to plugins. When sent by core to a plugin, the ID MUST be an ID
+// pointing to an instance of a channel on chat backend.
+message Channel {
+  string id = 1;
+  string display_name = 2;
+  string topic = 3;
+}
+
+// ChannelSource represents where a message came from. Note that User is used
+// rather than just an ID so any clients can have access to the name as well.
+// This may change in the future.
+message ChannelSource {
+  string channel_id = 1;
+  User user = 2;
+}
+
+// Common Events
+
+// MessageEvent will be sent when a user sends a message to a channel.
+message MessageEvent {
+  ChannelSource source = 1;
+  string text = 2;
+}
+
+// PrivateMessageEvent will be sent when a user sends a message directly to the
+// chat backend.
+message PrivateMessageEvent {
+  common.User source = 1;
+  string text = 2;
+}
+
+// MentionEvent will be sent when a user mentions the chat backend's user at the
+// start of a message in a channel. Note that this may eventually go away when a
+// more general message format is developed.
+message MentionEvent {
+  ChannelSource source = 1;
+  string text = 2;
+}
+
+// CommandEvent will be sent when a user issues a command in a channel. Commands
+// cannot be issued via private message. If a message is parsed as a command, it
+// MUST NOT be also sent as another message type.
+message CommandEvent {
+  ChannelSource source = 1;
+  string command = 2;
+  string arg = 3;
+}

@@ -4,13 +4,149 @@ option go_package = ".;pb";
 
 package seabird;
 
-// Identity is included in every message that requires auth. One AuthMethod at a
-// time is supported. For now, the only supported method is a token. These need
-// to be created manually and distributed to any clients.
-message Identity {
-  oneof AuthMethod {
-    string token = 1;
+import "common.proto";
+
+// Note that the IDs exposed by the Backend, User, and Channel are opaque IDs
+// which seabird-core will handle and route to the correct backend.
+
+message Event {
+  oneof inner {
+    common.MessageEvent message = 1;
+    common.PrivateMessageEvent private_message = 2;
+    common.MentionEvent mention = 3;
+    common.CommandEvent command = 4;
   }
+}
+
+// Request and response objects
+
+message StreamEventsRequest {
+  common.Identity identity = 1;
+
+  // A registry of commands this plugin responds to. A plugin MUST register all
+  // commands it responds to in order to receive those events. The
+  // CommandMetadata's name MUST match the map key, or an error will be
+  // returned.
+  //
+  // NOTE: help is a reserved command and cannot be registered by plugins.
+  map<string, CommandMetadata> commands = 2;
+}
+
+// CommandMetadata groups together a command's name along with short in-line
+// help and the full private help.
+//
+// An example for the "help" command might be a name of "help", a short_help of
+// "<command>" and an long help of "With no arguments, lists all available
+// commands. With an argument, display the long help for an item."
+message CommandMetadata {
+  string name = 1;
+  string short_help = 2;
+  string full_help = 3;
+}
+
+// Requests a plugin can make
+
+// Send a message to a given a channel.
+message SendMessageRequest {
+  common.Identity identity = 1;
+
+  string channel_id = 2;
+  string text = 3;
+}
+
+message SendMessageResponse {}
+
+// Send a private message to a given user.
+message SendPrivateMessageRequest {
+  common.Identity identity = 1;
+
+  string user_id = 2;
+  string text = 3;
+}
+
+message SendPrivateMessageResponse {}
+
+// Request to join a channel.
+message JoinChannelRequest {
+  common.Identity identity = 1;
+
+  string server_id = 2;
+
+  // NOTE: this channel_name is the only place name is used for an identifier -
+  // all other times channels will be referred to by ID.
+  string channel_name = 3;
+}
+
+message JoinChannelResponse {}
+
+// Request to leave a channel.
+message LeaveChannelRequest {
+  common.Identity identity = 1;
+
+  string channel_id = 2;
+  string exit_message = 3;
+}
+
+message LeaveChannelResponse {}
+
+// Request to list all connected backends.
+message ListBackendsRequest {
+  common.Identity identity = 1;
+}
+
+message ListBackendsResponse {
+  repeated common.Backend backends = 1;
+}
+
+// Get info about a specific connected backend.
+message BackendInfoRequest {
+  common.Identity identity = 1;
+
+  string backend_id = 2;
+}
+
+message BackendInfoResponse {
+  common.Backend service = 1;
+}
+
+message ListChannelsRequest {
+  common.Identity identity = 1;
+
+  string service_id = 2;
+}
+
+message ListChannelsResponse {
+  repeated common.Channel channels = 1;
+}
+
+message ChannelInfoRequest {
+  common.Identity identity = 1;
+
+  string channel_id = 2;
+}
+
+message ChannelInfoResponse {
+  common.Channel channel = 1;
+}
+
+message UpdateChannelInfoRequest {
+  common.Identity identity = 1;
+
+  string channel_id = 2;
+  string topic = 3;
+}
+
+message UpdateChannelInfoResponse {}
+
+// A request for metadata about the running core instance.
+message CoreInfoRequest {
+  common.Identity identity = 1;
+}
+
+// Metadata about the running core instance.
+message CoreInfoResponse {
+  string current_nick = 1;
+  int64 startup_timestamp = 2;
 }
 
 service Seabird {
@@ -18,154 +154,19 @@ service Seabird {
 
   // Chat actions
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+  rpc SendPrivateMessage(SendPrivateMessageRequest) returns (SendPrivateMessageResponse);
   rpc JoinChannel(JoinChannelRequest) returns (JoinChannelResponse);
   rpc LeaveChannel(LeaveChannelRequest) returns (LeaveChannelResponse);
+  rpc UpdateChannelInfo(UpdateChannelInfoRequest) returns (UpdateChannelInfoResponse);
+
+  // Chat backend introspection
+  rpc ListBackends(ListBackendsRequest) returns (ListBackendsResponse);
+  rpc GetBackendInfo(BackendInfoRequest) returns (BackendInfoResponse);
 
   // Chat connection introspection
   rpc ListChannels(ListChannelsRequest) returns (ListChannelsResponse);
   rpc GetChannelInfo(ChannelInfoRequest) returns (ChannelInfoResponse);
-  rpc SetChannelTopic(SetChannelTopicRequest) returns (SetChannelTopicResponse);
 
   // Seabird introspection
-  rpc ListStreams(ListStreamsRequest) returns (ListStreamsResponse);
-  rpc GetStreamInfo(StreamInfoRequest) returns (StreamInfoResponse);
   rpc GetCoreInfo(CoreInfoRequest) returns (CoreInfoResponse);
-}
-
-message StreamEventsRequest {
-  Identity identity = 1;
-
-  map<string, CommandMetadata> commands = 2;
-}
-
-message CommandMetadata {
-  string name = 1;
-  string short_help = 2;
-  string full_help = 3;
-}
-
-message Event {
-  oneof inner {
-    MessageEvent message = 1;
-    PrivateMessageEvent private_message = 2;
-    MentionEvent mention = 3;
-    CommandEvent command = 4;
-  }
-}
-
-message MessageEvent {
-  string reply_to = 1;
-  string sender = 2;
-  string message = 3;
-}
-
-message PrivateMessageEvent {
-  string reply_to = 1;
-  string sender = 2;
-  string message = 3;
-}
-
-message MentionEvent {
-  string reply_to = 1;
-  string sender = 2;
-  string message = 3;
-}
-
-message CommandEvent {
-  string reply_to = 1;
-  string sender = 2;
-  string command = 3;
-  string arg = 4;
-}
-
-message SendMessageRequest {
-  Identity identity = 1;
-
-  string target = 2;
-  string message = 3;
-}
-
-message SendMessageResponse {}
-
-message ListChannelsRequest {
-  Identity identity = 1;
-}
-
-message ListChannelsResponse {
-  repeated string names = 1;
-}
-
-message ChannelInfoRequest {
-  Identity identity = 1;
-
-  string name = 2;
-}
-
-message User {
-  string nick = 1;
-}
-
-message SetChannelTopicRequest {
-  Identity identity = 1;
-
-  string name = 2;
-  string topic = 3;
-}
-
-message SetChannelTopicResponse {}
-
-message ChannelInfoResponse {
-  string name = 1;
-  string topic = 2;
-  repeated User users = 3;
-}
-
-message JoinChannelRequest {
-  Identity identity = 1;
-
-  string name = 2;
-}
-
-message JoinChannelResponse {}
-
-message LeaveChannelRequest {
-  Identity identity = 1;
-
-  string name = 2;
-  string message = 3;
-}
-
-message LeaveChannelResponse {}
-
-message ListStreamsRequest {
-  Identity identity = 1;
-}
-
-message ListStreamsResponse {
-  repeated string stream_ids = 1;
-}
-
-message StreamInfoRequest {
-  Identity identity = 1;
-
-  string stream_id = 2;
-}
-
-message StreamInfoResponse {
-  string id = 1;
-  string tag = 2;
-
-  map<string, CommandMetadata> commands = 3;
-
-  string remote_address = 4;
-  int64 connection_timestamp = 5;
-}
-
-message CoreInfoRequest {
-  Identity identity = 1;
-}
-
-message CoreInfoResponse {
-  string current_nick = 1;
-  int64 startup_timestamp = 2;
 }
