@@ -77,9 +77,7 @@ message ChatRequest {
 // core based on the backend. As an example, a backend of type "foo" and an ID
 // of "bar" may show up as something like "foo.bar" to plugins.
 message HelloChatEvent {
-  common.Identity identity = 1;
-
-  common.Backend backend_info = 2;
+  common.Backend backend_info = 1;
 }
 
 // This is a marker event to respond to seabird-core that performing an action
