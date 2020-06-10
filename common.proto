@@ -4,15 +4,6 @@ option go_package = ".;pb";
 
 package common;
 
-// Identity is included in every message that requires auth. One AuthMethod at a
-// time is supported. For now, the only supported method is a token. These
-// tokens need to be created manually and distributed to any clients.
-message Identity {
-  oneof AuthMethod {
-    string token = 1;
-  }
-}
-
 // When sent by a chat backend, the ID MAY optionally be used as a hint to the
 // frontend to get the same external ID on reconnection. When sent by core to a
 // plugin, the ID MUST be an ID pointing to an exact backend instance.

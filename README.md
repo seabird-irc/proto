@@ -26,7 +26,13 @@ Yes, for the following reasons:
 
 ## Client connection information
 
-Each gRPC request contains an Identity as the first field. This should be constructed with an auth token. Auth tokens need to be manually configured on the server side.
+Auth tokens must be sent in the Authorization header (sometimes exposed as the request metadata). They are in the standard bearer token format as follows:
+
+```
+Authorization: Bearer <auth token>
+```
+
+Auth tokens need to be manually configured on the server side.
 
 ## What is "core"?
 

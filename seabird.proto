@@ -21,15 +21,13 @@ message Event {
 // Request and response objects
 
 message StreamEventsRequest {
-  common.Identity identity = 1;
-
   // A registry of commands this plugin responds to. A plugin MUST register all
   // commands it responds to in order to receive those events. The
   // CommandMetadata's name MUST match the map key, or an error will be
   // returned.
   //
   // NOTE: help is a reserved command and cannot be registered by plugins.
-  map<string, CommandMetadata> commands = 2;
+  map<string, CommandMetadata> commands = 1;
 }
 
 // CommandMetadata groups together a command's name along with short in-line
@@ -48,51 +46,41 @@ message CommandMetadata {
 
 // Send a message to a given a channel.
 message SendMessageRequest {
-  common.Identity identity = 1;
-
-  string channel_id = 2;
-  string text = 3;
+  string channel_id = 1;
+  string text = 2;
 }
 
 message SendMessageResponse {}
 
 // Send a private message to a given user.
 message SendPrivateMessageRequest {
-  common.Identity identity = 1;
-
-  string user_id = 2;
-  string text = 3;
+  string user_id = 1;
+  string text = 2;
 }
 
 message SendPrivateMessageResponse {}
 
 // Request to join a channel.
 message JoinChannelRequest {
-  common.Identity identity = 1;
-
-  string server_id = 2;
+  string server_id = 1;
 
   // NOTE: this channel_name is the only place name is used for an identifier -
   // all other times channels will be referred to by ID.
-  string channel_name = 3;
+  string channel_name = 2;
 }
 
 message JoinChannelResponse {}
 
 // Request to leave a channel.
 message LeaveChannelRequest {
-  common.Identity identity = 1;
-
-  string channel_id = 2;
-  string exit_message = 3;
+  string channel_id = 1;
+  string exit_message = 2;
 }
 
 message LeaveChannelResponse {}
 
 // Request to list all connected backends.
-message ListBackendsRequest {
-  common.Identity identity = 1;
-}
+message ListBackendsRequest {}
 
 message ListBackendsResponse {
   repeated common.Backend backends = 1;
@@ -100,9 +88,7 @@ message ListBackendsResponse {
 
 // Get info about a specific connected backend.
 message BackendInfoRequest {
-  common.Identity identity = 1;
-
-  string backend_id = 2;
+  string backend_id = 1;
 }
 
 message BackendInfoResponse {
@@ -110,9 +96,7 @@ message BackendInfoResponse {
 }
 
 message ListChannelsRequest {
-  common.Identity identity = 1;
-
-  string service_id = 2;
+  string service_id = 1;
 }
 
 message ListChannelsResponse {
@@ -120,9 +104,7 @@ message ListChannelsResponse {
 }
 
 message ChannelInfoRequest {
-  common.Identity identity = 1;
-
-  string channel_id = 2;
+  string channel_id = 1;
 }
 
 message ChannelInfoResponse {
@@ -130,18 +112,14 @@ message ChannelInfoResponse {
 }
 
 message UpdateChannelInfoRequest {
-  common.Identity identity = 1;
-
-  string channel_id = 2;
-  string topic = 3;
+  string channel_id = 1;
+  string topic = 2;
 }
 
 message UpdateChannelInfoResponse {}
 
 // A request for metadata about the running core instance.
-message CoreInfoRequest {
-  common.Identity identity = 1;
-}
+message CoreInfoRequest {}
 
 // Metadata about the running core instance.
 message CoreInfoResponse {
