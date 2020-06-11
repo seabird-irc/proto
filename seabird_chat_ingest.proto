@@ -15,7 +15,7 @@ package seabird;
 // also be sent to the chat backend's event stream.
 message SendMessageChatRequest {
   string channel_id = 1;
-  string message = 2;
+  string text = 2;
 }
 
 // SendPrivateMessageChatRequest requests for a message to be sent to a given
@@ -24,7 +24,7 @@ message SendMessageChatRequest {
 // connection MUST NOT also be sent to the chat backend's event stream.
 message SendPrivateMessageChatRequest {
   string user_id = 1;
-  string message = 2;
+  string text = 2;
 }
 
 // JoinChannelChatRequest requests for the bot to join a channel with the given
@@ -41,10 +41,10 @@ message LeaveChannelChatRequest {
   string channel_id = 1;
 }
 
-// UpdateChannelChatRequest requests for a the channel to be updated with the
+// UpdateChannelInfoChatRequest requests for a the channel to be updated with the
 // given metadata. Either ChangeChannelEvent or FailedChatEvent SHOULD be returned
 // in response if possible.
-message UpdateChannelChatRequest {
+message UpdateChannelInfoChatRequest {
   string channel_id = 1;
   string topic = 2;
 }
@@ -63,7 +63,7 @@ message ChatRequest {
     SendPrivateMessageChatRequest send_private_message = 3;
     JoinChannelChatRequest join_channel = 4;
     LeaveChannelChatRequest leave_channel = 5;
-    UpdateChannelChatRequest update_channel = 6;
+    UpdateChannelInfoChatRequest update_channel_info = 6;
   }
 }
 
