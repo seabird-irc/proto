@@ -62,7 +62,7 @@ message SendPrivateMessageResponse {}
 
 // Request to join a channel.
 message JoinChannelRequest {
-  string server_id = 1;
+  string backend_id = 1;
 
   // NOTE: this channel_name is the only place name is used for an identifier -
   // all other times channels will be referred to by ID.
@@ -92,11 +92,11 @@ message BackendInfoRequest {
 }
 
 message BackendInfoResponse {
-  common.Backend service = 1;
+  common.Backend Backend = 1;
 }
 
 message ListChannelsRequest {
-  string service_id = 1;
+  string backend_id = 1;
 }
 
 message ListChannelsResponse {

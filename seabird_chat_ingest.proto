@@ -94,20 +94,20 @@ message FailedChatEvent {
 
 // JoinChannelEvent will be sent when a user joins a channel. The topic SHOULD
 // be included if possible, but it can be sent in a topic update event later.
-message JoinChannelEvent {
+message JoinChannelChatEvent {
   string channel_id = 1;
   string display_name = 2;
   string topic = 3;
 }
 
 // LeaveChannelEvent will be sent when a user leaves a channel.
-message LeaveChannelEvent {
+message LeaveChannelChatEvent {
   string channel_id = 1;
 }
 
 // ChangeChannelEvent will occur when a channel's display name or topic is
 // updated.
-message ChangeChannelEvent {
+message ChangeChannelChatEvent {
   string channel_id = 1;
   string display_name = 2;
   string topic = 3;
@@ -141,9 +141,9 @@ message ChatEvent {
     common.CommandEvent command = 8;
 
     // Channel changes
-    JoinChannelEvent join_channel = 9;
-    LeaveChannelEvent leave_channel = 10;
-    ChangeChannelEvent change_channel = 11;
+    JoinChannelChatEvent join_channel = 9;
+    LeaveChannelChatEvent leave_channel = 10;
+    ChangeChannelChatEvent change_channel = 11;
   }
 }
 
