@@ -123,7 +123,7 @@ message CoreInfoRequest {}
 
 // Metadata about the running core instance.
 message CoreInfoResponse {
-  int64 startup_timestamp = 1;
+  uint64 startup_timestamp = 1;
 }
 
 service Seabird {
