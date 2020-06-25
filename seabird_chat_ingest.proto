@@ -140,6 +140,7 @@ message ChatEvent {
     common.PrivateMessageEvent private_message = 6;
     common.MentionEvent mention = 7;
     common.CommandEvent command = 8;
+    common.ActionEvent action = 12;
 
     // Channel changes
     JoinChannelChatEvent join_channel = 9;

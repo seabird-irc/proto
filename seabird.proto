@@ -16,6 +16,7 @@ message Event {
     common.PrivateMessageEvent private_message = 2;
     common.MentionEvent mention = 3;
     common.CommandEvent command = 4;
+    common.ActionEvent action = 5;
   }
 }
 

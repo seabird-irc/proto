@@ -71,3 +71,10 @@ message CommandEvent {
   string command = 2;
   string arg = 3;
 }
+
+// ActionEvent will be sent when a user takes an action. This is often triggered
+// with /me.
+message ActionEvent {
+  ChannelSource source = 1;
+  string text = 2;
+}
