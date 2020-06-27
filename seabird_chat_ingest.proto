@@ -13,9 +13,18 @@ package seabird;
 // PerformActionRequest is often known as /me. Either SuccessChatEvent or
 // FailedChatEvent SHOULD be returned in response if possible. The
 // PerformActionEvent written to the chat backend's connection MUST NOT also be
-// sent to the chat backend's event stream..
+// sent to the chat backend's event stream.
 message PerformActionChatRequest {
   string channel_id = 1;
+  string text = 2;
+}
+
+// PerformPrivateActionRequest is often known as /me. Either SuccessChatEvent or
+// FailedChatEvent SHOULD be returned in response if possible. The
+// PerformActionEvent written to the chat backend's connection MUST NOT also be
+// sent to the chat backend's event stream.
+message PerformPrivateActionChatRequest {
+  string user_id = 1;
   string text = 2;
 }
 
@@ -75,6 +84,7 @@ message ChatRequest {
     LeaveChannelChatRequest leave_channel = 5;
     UpdateChannelInfoChatRequest update_channel_info = 6;
     PerformActionChatRequest perform_action = 7;
+    PerformPrivateActionChatRequest perform_private_action = 8;
   }
 }
 
@@ -151,6 +161,7 @@ message ChatEvent {
     common.MentionEvent mention = 7;
     common.CommandEvent command = 8;
     common.ActionEvent action = 12;
+    common.PrivateActionEvent private_action = 13;
 
     // Channel changes
     JoinChannelChatEvent join_channel = 9;
