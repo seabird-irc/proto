@@ -16,6 +16,8 @@ message Event {
     common.PrivateMessageEvent private_message = 2;
     common.MentionEvent mention = 3;
     common.CommandEvent command = 4;
+    common.ActionEvent action = 5;
+    common.PrivateActionEvent private_action = 6;
   }
 }
 
@@ -44,6 +46,22 @@ message CommandMetadata {
 }
 
 // Requests a plugin can make
+
+// Perform an action in a given channel.
+message PerformActionRequest {
+  string channel_id = 1;
+  string text = 2;
+}
+
+message PerformActionResponse {}
+
+// Perform an action in a private message.
+message PerformPrivateActionRequest {
+  string user_id = 1;
+  string text = 2;
+}
+
+message PerformPrivateActionResponse {}
 
 // Send a message to a given a channel.
 message SendMessageRequest {
@@ -131,6 +149,8 @@ service Seabird {
   rpc StreamEvents(StreamEventsRequest) returns (stream Event);
 
   // Chat actions
+  rpc PerformAction(PerformActionRequest) returns (PerformActionResponse);
+  rpc PerformPrivateAction(PerformPrivateActionRequest) returns (PerformPrivateActionResponse);
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
   rpc SendPrivateMessage(SendPrivateMessageRequest) returns (SendPrivateMessageResponse);
   rpc JoinChannel(JoinChannelRequest) returns (JoinChannelResponse);
