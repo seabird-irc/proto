@@ -1,8 +1,31 @@
 syntax = "proto3";
 
+option java_package = "io.coded.seabird.common";
 option go_package = ".;pb";
 
 package common;
+
+// All IDs come in two forms - relative and absolute. Relative IDs are sent only
+// by chat backends, while Absolute IDs will only be seen by plugins. A backend
+// will only see relative IDs, plugins will only see absolute IDs.
+//
+// Relative IDs are a string of any characters which can be properly urlencoded.
+//
+// Absolute IDs are a URL with the following parts representing different
+// things:
+// - Scheme refers to the backend type (irc, discord, etc)
+// - Host refers to the ID of the backend
+// - Path refers to the relative ID of this item. Note that this MUST be
+//   properly urlencoded as it can contain characters which would cause it to
+//   parse differently, such as `#`, often used by the IRC backend to represent
+//   channels.
+//
+// An absolute ID MUST be unique among all items in that set, but they do not
+// need to be unique globally.
+//
+// Note that absolute IDs do not match character-for-character between the
+// different backend implementations, but they MUST decode to the same
+// components.
 
 // When sent by a chat backend, the ID MAY optionally be used as a hint to the
 // frontend to get the same external ID on reconnection. When sent by core to a
@@ -69,4 +92,18 @@ message CommandEvent {
   ChannelSource source = 1;
   string command = 2;
   string arg = 3;
+}
+
+// ActionEvent will be sent when a user takes an action in a channel. This is
+// often triggered with /me.
+message ActionEvent {
+  ChannelSource source = 1;
+  string text = 2;
+}
+
+// PrivateActionEvent will be sent when a user takes an action in a private
+// message. This is often triggered with /me.
+message PrivateActionEvent {
+  common.User source = 1;
+  string text = 2;
 }
