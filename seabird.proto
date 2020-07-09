@@ -35,7 +35,7 @@ message Event {
 // client sending the message.
 message SendMessageEvent {
   string sender = 1;
-  common.MessageEvent event = 2;
+  SendMessageRequest inner = 2;
 }
 
 // SendPrivateMessageEvent will be emitted whenever a plugin or other client
@@ -44,7 +44,7 @@ message SendMessageEvent {
 // param refers to the client sending the message.
 message SendPrivateMessageEvent {
   string sender = 1;
-  common.PrivateMessageEvent event = 2;
+  SendPrivateMessageRequest inner = 2;
 }
 
 // PerformActionEvent will be emitted whenever a plugin or other client calls
@@ -53,7 +53,7 @@ message SendPrivateMessageEvent {
 // client sending the message.
 message PerformActionEvent {
   string sender = 1;
-  common.ActionEvent event = 2;
+  PerformActionRequest inner = 2;
 }
 
 // PerformPrivateActionEvent will be emitted whenever a plugin or other client
@@ -62,7 +62,7 @@ message PerformActionEvent {
 // param refers to the client sending the message.
 message PerformPrivateActionEvent {
   string sender = 1;
-  common.PrivateActionEvent event = 2;
+  PerformPrivateActionRequest inner = 2;
 }
 
 // Request and response objects
