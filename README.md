@@ -32,7 +32,9 @@ Auth tokens must be sent in the Authorization header (sometimes exposed as the r
 Authorization: Bearer <auth token>
 ```
 
-Auth tokens need to be manually configured on the server side.
+Auth tokens need to be manually configured on the server side. Each token can only refer to a single user, but a user can have multiple tokens.
+
+Currently, the only reserved usernames are `seabird` and `core`.
 
 ## What is "core"?
 

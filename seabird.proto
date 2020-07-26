@@ -12,13 +12,57 @@ import "common.proto";
 
 message Event {
   oneof inner {
+    // Events sent by chat backends.
     common.MessageEvent message = 1;
     common.PrivateMessageEvent private_message = 2;
     common.MentionEvent mention = 3;
     common.CommandEvent command = 4;
     common.ActionEvent action = 5;
     common.PrivateActionEvent private_action = 6;
+
+    // Events sent by plugins and other clients. Generally, these are only
+    // needed for special cases.
+    SendMessageEvent send_message = 7;
+    SendPrivateMessageEvent send_private_message = 8;
+    PerformActionEvent perform_action = 9;
+    PerformPrivateActionEvent perform_private_action = 10;
   }
+}
+
+// SendMessageEvent will be emitted whenever a plugin or other client calls
+// SendMessage. Note that this will be emitted every time SendMessage is
+// called, not when it succeeds. The additional sender param refers to the
+// client sending the message.
+message SendMessageEvent {
+  string sender = 1;
+  SendMessageRequest inner = 2;
+}
+
+// SendPrivateMessageEvent will be emitted whenever a plugin or other client
+// calls SendPrivateMessage. Note that this will be emitted every time
+// SendPrivateMessage is called, not when it succeeds.The additional sender
+// param refers to the client sending the message.
+message SendPrivateMessageEvent {
+  string sender = 1;
+  SendPrivateMessageRequest inner = 2;
+}
+
+// PerformActionEvent will be emitted whenever a plugin or other client calls
+// PerformAction. Note that this will be emitted every time PerformAction is
+// called, not when it succeeds. The additional sender param refers to the
+// client sending the message.
+message PerformActionEvent {
+  string sender = 1;
+  PerformActionRequest inner = 2;
+}
+
+// PerformPrivateActionEvent will be emitted whenever a plugin or other client
+// calls PerformPrivateAction. Note that this will be emitted every time
+// PerformPrivateAction is called, not when it succeeds. The additional sender
+// param refers to the client sending the message.
+message PerformPrivateActionEvent {
+  string sender = 1;
+  PerformPrivateActionRequest inner = 2;
 }
 
 // Request and response objects
