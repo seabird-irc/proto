@@ -158,6 +158,14 @@ message BackendInfoResponse {
   common.Backend Backend = 1;
 }
 
+message BackendConfigRequest {
+  string backend_id = 1;
+}
+
+message BackendConfigResponse {
+  map<string, string> config = 1;
+}
+
 message ListChannelsRequest {
   string backend_id = 1;
 }
@@ -204,6 +212,7 @@ service Seabird {
   // Chat backend introspection
   rpc ListBackends(ListBackendsRequest) returns (ListBackendsResponse);
   rpc GetBackendInfo(BackendInfoRequest) returns (BackendInfoResponse);
+  rpc GetBackendConfig(BackendConfigRequest) returns (BackendConfigResponse);
 
   // Chat connection introspection
   rpc ListChannels(ListChannelsRequest) returns (ListChannelsResponse);

@@ -68,6 +68,8 @@ message UpdateChannelInfoChatRequest {
   string topic = 2;
 }
 
+message GetConfigChatRequest {}
+
 // Each ChatRequest has an ID (which can be attached to requests coming from
 // core) and an inner message type. Having an ID allows us to route an event
 // back to the requestor without having the chat backend implement a service.
@@ -85,6 +87,7 @@ message ChatRequest {
     UpdateChannelInfoChatRequest update_channel_info = 6;
     PerformActionChatRequest perform_action = 7;
     PerformPrivateActionChatRequest perform_private_action = 8;
+    GetConfigChatRequest get_config = 9;
   }
 }
 
@@ -134,6 +137,10 @@ message ChangeChannelChatEvent {
   string topic = 3;
 }
 
+message ConfigChatEvent {
+  map<string, string> config = 1;
+}
+
 // ChatEvent contains all the different event types a chat backend can emit.
 // Note that these are slightly different to the seabird.Event types as channels
 // here will not be mapped to UUIDs and some events are only to support the data
@@ -167,6 +174,9 @@ message ChatEvent {
     JoinChannelChatEvent join_channel = 9;
     LeaveChannelChatEvent leave_channel = 10;
     ChangeChannelChatEvent change_channel = 11;
+
+    // Introspection
+    ConfigChatEvent config = 14;
   }
 }
 
