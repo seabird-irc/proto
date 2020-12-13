@@ -68,7 +68,9 @@ message UpdateChannelInfoChatRequest {
   string topic = 2;
 }
 
-message GetConfigChatRequest {}
+// MetadataChatRequest requests metadata about the given backend. seabird-core
+// expects the backend to respond with a MetadataChatEvent object.
+message MetadataChatRequest {}
 
 // Each ChatRequest has an ID (which can be attached to requests coming from
 // core) and an inner message type. Having an ID allows us to route an event
@@ -87,7 +89,7 @@ message ChatRequest {
     UpdateChannelInfoChatRequest update_channel_info = 6;
     PerformActionChatRequest perform_action = 7;
     PerformPrivateActionChatRequest perform_private_action = 8;
-    GetConfigChatRequest get_config = 9;
+    MetadataChatRequest metadata = 9;
   }
 }
 
@@ -137,7 +139,9 @@ message ChangeChannelChatEvent {
   string topic = 3;
 }
 
-message ConfigChatEvent {
+// MetadataChatEvent will be sent in response to a MetadataChatRequest. It
+// is not sent directly without a corresponding request from seabird-core.
+message MetadataChatEvent {
   map<string, string> config = 1;
 }
 
@@ -176,7 +180,7 @@ message ChatEvent {
     ChangeChannelChatEvent change_channel = 11;
 
     // Introspection
-    ConfigChatEvent config = 14;
+    MetadataChatEvent metadata = 14;
   }
 }
 
