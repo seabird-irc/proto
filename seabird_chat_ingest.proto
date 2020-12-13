@@ -142,7 +142,7 @@ message ChangeChannelChatEvent {
 // MetadataChatEvent will be sent in response to a MetadataChatRequest. It
 // is not sent directly without a corresponding request from seabird-core.
 message MetadataChatEvent {
-  map<string, string> config = 1;
+  map<string, string> values = 1;
 }
 
 // ChatEvent contains all the different event types a chat backend can emit.
