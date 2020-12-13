@@ -156,7 +156,7 @@ message BackendInfoRequest {
 
 message BackendInfoResponse {
   common.Backend Backend = 1;
-  map<string, string> config = 2;
+  map<string, string> metadata = 2;
 }
 
 message ListChannelsRequest {
