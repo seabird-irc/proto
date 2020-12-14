@@ -191,6 +191,12 @@ message CoreInfoResponse {
   uint64 current_timestamp = 2;
 }
 
+message CommandsRequest {}
+
+message CommandsResponse {
+  map<string, CommandMetadata> commands = 1;
+}
+
 service Seabird {
   rpc StreamEvents(StreamEventsRequest) returns (stream Event);
 
@@ -213,4 +219,5 @@ service Seabird {
 
   // Seabird introspection
   rpc GetCoreInfo(CoreInfoRequest) returns (CoreInfoResponse);
+  rpc RegisteredCommands(CommandsRequest) returns (CommandsResponse);
 }
