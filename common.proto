@@ -22,10 +22,6 @@ package common;
 //
 // An absolute ID MUST be unique among all items in that set, but they do not
 // need to be unique globally.
-//
-// Note that absolute IDs do not match character-for-character between the
-// different backend implementations, but they MUST decode to the same
-// components.
 
 // When sent by a chat backend, the ID MAY optionally be used as a hint to the
 // frontend to get the same external ID on reconnection. When sent by core to a
@@ -33,6 +29,7 @@ package common;
 message Backend {
   string id = 1;
   string type = 2;
+  string callback_url = 3;
 }
 
 // When sent by a chat backend, the ID MUST be unique across users in that running
@@ -107,3 +104,72 @@ message PrivateActionEvent {
   common.User source = 1;
   string text = 2;
 }
+
+// Actions which can be performed via RPC. These are used in both core's
+// interface and the chat backend interface.
+
+// PerformActionRequest is often known as /me. Either an error or
+// PerformActionResponse will be returned.
+message PerformActionRequest {
+  string channel_id = 1;
+  string text = 2;
+}
+
+message PerformActionResponse {}
+
+// PerformPrivateActionRequest is often known as /me. Either an error or
+// PerformPrivateActionResponse will be returned.
+message PerformPrivateActionRequest {
+  string user_id = 1;
+  string text = 2;
+}
+
+message PerformPrivateActionResponse {}
+
+// SendMessageRequest requests for a message to be sent to a given channel.
+// Either an error or SendMessageResponse will be returned.
+message SendMessageRequest {
+  string channel_id = 1;
+  string text = 2;
+}
+
+message SendMessageResponse {}
+
+// SendPrivateMessageRequest requests for a message to be sent to a given
+// user. Either an error or SendPrivateMessageResponse will be returned.
+message SendPrivateMessageRequest {
+  string user_id = 1;
+  string text = 2;
+}
+
+message SendPrivateMessageResponse {}
+
+// JoinChannelRequest requests for the bot to join the channel with the
+// given name. Either an error or JoinChannelResponse will be returned.
+message JoinChannelRequest {
+  string backend_id = 1;
+
+  // NOTE: this channel_name is the only place name is used for an identifier -
+  // all other times channels will be referred to by ID.
+  string channel_name = 2;
+}
+
+message JoinChannelResponse {}
+
+// LeaveChannelRequest requests for the bot to leave the channel with the
+// given ID. Either an error or LeaveChannelResponse will be returned.
+message LeaveChannelRequest {
+  string channel_id = 1;
+  string exit_message = 2;
+}
+
+message LeaveChannelResponse {}
+
+// UpdateChannelInfoRequest requests for a the channel to be updated with the
+// given metadata. Either an error or UpdateChannelInfoResponse will be returned.
+message UpdateChannelInfoRequest {
+  string channel_id = 1;
+  string topic = 2;
+}
+
+message UpdateChannelInfoResponse {}

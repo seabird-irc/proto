@@ -7,92 +7,6 @@ import "common.proto";
 
 package seabird;
 
-// Note that all of the types in this file end with ChatRequest or end with
-// ChatEvent to prevent namespace conflicts between the main seabird.proto file.
-
-// PerformActionRequest is often known as /me. Either SuccessChatEvent or
-// FailedChatEvent SHOULD be returned in response if possible. The
-// PerformActionEvent written to the chat backend's connection MUST NOT also be
-// sent to the chat backend's event stream.
-message PerformActionChatRequest {
-  string channel_id = 1;
-  string text = 2;
-}
-
-// PerformPrivateActionRequest is often known as /me. Either SuccessChatEvent or
-// FailedChatEvent SHOULD be returned in response if possible. The
-// PerformActionEvent written to the chat backend's connection MUST NOT also be
-// sent to the chat backend's event stream.
-message PerformPrivateActionChatRequest {
-  string user_id = 1;
-  string text = 2;
-}
-
-// SendMessageChatRequest requests for a message to be sent to a given channel.
-// Either SuccessChatEvent or FailedChatEvent SHOULD be returned in response if
-// possible. The MessageEvent written to the chat backend's connection MUST NOT
-// also be sent to the chat backend's event stream.
-message SendMessageChatRequest {
-  string channel_id = 1;
-  string text = 2;
-}
-
-// SendPrivateMessageChatRequest requests for a message to be sent to a given
-// user. Either SuccessChatEvent or FailedChatEvent SHOULD be returned in
-// response if possible. The PrivateMessageEvent written to the chat backend's
-// connection MUST NOT also be sent to the chat backend's event stream.
-message SendPrivateMessageChatRequest {
-  string user_id = 1;
-  string text = 2;
-}
-
-// JoinChannelChatRequest requests for the bot to join a channel with the given
-// name. Either JoinChannelEvent or FailedChatEvent SHOULD be returned in
-// response if possible.
-message JoinChannelChatRequest {
-  string channel_name = 1;
-}
-
-// LeaveChannelChatRequest requests for the bot to leave the channel with the
-// given ID. Either LeaveChannelEvent or FailedChatEvent SHOULD be returned in
-// response if possible.
-message LeaveChannelChatRequest {
-  string channel_id = 1;
-}
-
-// UpdateChannelInfoChatRequest requests for a the channel to be updated with the
-// given metadata. Either ChangeChannelEvent or FailedChatEvent SHOULD be returned
-// in response if possible.
-message UpdateChannelInfoChatRequest {
-  string channel_id = 1;
-  string topic = 2;
-}
-
-// MetadataChatRequest requests metadata about the given backend. seabird-core
-// expects the backend to respond with a MetadataChatEvent object.
-message MetadataChatRequest {}
-
-// Each ChatRequest has an ID (which can be attached to requests coming from
-// core) and an inner message type. Having an ID allows us to route an event
-// back to the requestor without having the chat backend implement a service.
-//
-// When a request does not get a response, the action may still happen and be
-// sent to the event stream, but the plugin may receive a timed out request.
-message ChatRequest {
-  string id = 1;
-
-  oneof inner {
-    SendMessageChatRequest send_message = 2;
-    SendPrivateMessageChatRequest send_private_message = 3;
-    JoinChannelChatRequest join_channel = 4;
-    LeaveChannelChatRequest leave_channel = 5;
-    UpdateChannelInfoChatRequest update_channel_info = 6;
-    PerformActionChatRequest perform_action = 7;
-    PerformPrivateActionChatRequest perform_private_action = 8;
-    MetadataChatRequest metadata = 9;
-  }
-}
-
 // HelloChatEvent MUST be the first event sent by the chat backend. If a
 // different event is sent, the connection will be closed. The chat backend MUST
 // provide an ID unique between all running instances of this type in the
@@ -104,18 +18,6 @@ message ChatRequest {
 // of "bar" may show up as something like "foo.bar" to plugins.
 message HelloChatEvent {
   common.Backend backend_info = 1;
-}
-
-// This is a marker event to respond to seabird-core that performing an action
-// has succeeded. Note that most requests have explicit associated Events, so
-// this should only be used in absence of a matching event.
-message SuccessChatEvent {}
-
-// This is a marker event to respond to seabird-core that performing an action
-// has failed. Failed events do not in any way affect chat backends. They serve
-// only to notify plugins of failed actions.
-message FailedChatEvent {
-  string reason = 1;
 }
 
 // JoinChannelEvent will be sent when a user joins a channel. The topic SHOULD
@@ -139,12 +41,6 @@ message ChangeChannelChatEvent {
   string topic = 3;
 }
 
-// MetadataChatEvent will be sent in response to a MetadataChatRequest. It
-// is not sent directly without a corresponding request from seabird-core.
-message MetadataChatEvent {
-  map<string, string> values = 1;
-}
-
 // ChatEvent contains all the different event types a chat backend can emit.
 // Note that these are slightly different to the seabird.Event types as channels
 // here will not be mapped to UUIDs and some events are only to support the data
@@ -152,19 +48,14 @@ message MetadataChatEvent {
 //
 // HelloChatEvent is the only message type that is required for a chat backend
 // to work.
-//
-// Core may be configured with both time-based and load-based request failure
-// mechanisms. It can fail any action and serve that as an error to plugins. If
-// an ID is included which has timed out in core or otherwise does not exist, it
-// will be ignored.
 message ChatEvent {
+  reserved 3, 4, 14;
+
   string id = 1;
 
   oneof inner {
     // Seabird-internal event types
     HelloChatEvent hello = 2;
-    SuccessChatEvent success = 3;
-    FailedChatEvent failed = 4;
 
     // Messages from the service
     common.MessageEvent message = 5;
@@ -176,17 +67,16 @@ message ChatEvent {
 
     // Channel changes
     JoinChannelChatEvent join_channel = 9;
-    LeaveChannelChatEvent leave_channel = 10;
+    LeaveChannelChatyeahEvent leave_channel = 10;
     ChangeChannelChatEvent change_channel = 11;
-
-    // Introspection
-    MetadataChatEvent metadata = 14;
   }
 }
+
+message IngestEventsResponse {}
 
 // This service is exposed separately to the chat frontend. Its purpose is to
 // allow multiple different chat backends to register to Core and allow plugins
 // to communicate with them.
 service ChatIngest {
-  rpc IngestEvents(stream ChatEvent) returns (stream ChatRequest);
+  rpc IngestEvents(stream ChatEvent) returns (IngestEventsResponse);
 }
