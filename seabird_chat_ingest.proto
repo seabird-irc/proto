@@ -67,7 +67,7 @@ message ChatEvent {
 
     // Channel changes
     JoinChannelChatEvent join_channel = 9;
-    LeaveChannelChatyeahEvent leave_channel = 10;
+    LeaveChannelChatEvent leave_channel = 10;
     ChangeChannelChatEvent change_channel = 11;
   }
 }

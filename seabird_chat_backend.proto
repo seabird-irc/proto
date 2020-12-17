@@ -15,8 +15,8 @@ package seabird;
 // Each ChatBackend MUST implement grpc.health.v1.Health in addition to the
 // ChatBackend interface.
 service ChatBackend {
-	rpc SendMessage(common.SendMessageRequest) returns (common.SendMessageResponse);
-	rpc SendPrivateMessage(common.SendPrivateMessageRequest) returns (common.SendPrivateMessageResponse);
+  rpc SendMessage(common.SendMessageRequest) returns (common.SendMessageResponse);
+  rpc SendPrivateMessage(common.SendPrivateMessageRequest) returns (common.SendPrivateMessageResponse);
 
   rpc PerformAction(common.PerformActionRequest) returns (common.PerformActionResponse);
   rpc PerformPrivateAction(common.PerformPrivateActionRequest) returns (common.PerformPrivateActionResponse);
