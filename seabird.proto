@@ -22,10 +22,10 @@ message Event {
 
     // Events sent by plugins and other clients. Generally, these are only
     // needed for special cases.
-    SendMessageEvent send_message = 7;
-    SendPrivateMessageEvent send_private_message = 8;
-    PerformActionEvent perform_action = 9;
-    PerformPrivateActionEvent perform_private_action = 10;
+    SendMessageRequestEvent send_message = 7;
+    SendPrivateMessageRequestEvent send_private_message = 8;
+    PerformActionRequestEvent perform_action = 9;
+    PerformPrivateActionRequestEvent perform_private_action = 10;
   }
 }
 
@@ -33,36 +33,36 @@ message Event {
 // SendMessage. Note that this will be emitted every time SendMessage is
 // called, not when it succeeds. The additional sender param refers to the
 // client sending the message.
-message SendMessageEvent {
+message SendMessageRequestEvent {
   string sender = 1;
-  SendMessageRequest inner = 2;
+  common.SendMessageRequest inner = 2;
 }
 
 // SendPrivateMessageEvent will be emitted whenever a plugin or other client
 // calls SendPrivateMessage. Note that this will be emitted every time
 // SendPrivateMessage is called, not when it succeeds.The additional sender
 // param refers to the client sending the message.
-message SendPrivateMessageEvent {
+message SendPrivateMessageRequestEvent {
   string sender = 1;
-  SendPrivateMessageRequest inner = 2;
+  common.SendPrivateMessageRequest inner = 2;
 }
 
 // PerformActionEvent will be emitted whenever a plugin or other client calls
 // PerformAction. Note that this will be emitted every time PerformAction is
 // called, not when it succeeds. The additional sender param refers to the
 // client sending the message.
-message PerformActionEvent {
+message PerformActionRequestEvent {
   string sender = 1;
-  PerformActionRequest inner = 2;
+  common.PerformActionRequest inner = 2;
 }
 
 // PerformPrivateActionEvent will be emitted whenever a plugin or other client
 // calls PerformPrivateAction. Note that this will be emitted every time
 // PerformPrivateAction is called, not when it succeeds. The additional sender
 // param refers to the client sending the message.
-message PerformPrivateActionEvent {
+message PerformPrivateActionRequestEvent {
   string sender = 1;
-  PerformPrivateActionRequest inner = 2;
+  common.PerformPrivateActionRequest inner = 2;
 }
 
 // Request and response objects
@@ -88,59 +88,6 @@ message CommandMetadata {
   string short_help = 2;
   string full_help = 3;
 }
-
-// Requests a plugin can make
-
-// Perform an action in a given channel.
-message PerformActionRequest {
-  string channel_id = 1;
-  string text = 2;
-}
-
-message PerformActionResponse {}
-
-// Perform an action in a private message.
-message PerformPrivateActionRequest {
-  string user_id = 1;
-  string text = 2;
-}
-
-message PerformPrivateActionResponse {}
-
-// Send a message to a given a channel.
-message SendMessageRequest {
-  string channel_id = 1;
-  string text = 2;
-}
-
-message SendMessageResponse {}
-
-// Send a private message to a given user.
-message SendPrivateMessageRequest {
-  string user_id = 1;
-  string text = 2;
-}
-
-message SendPrivateMessageResponse {}
-
-// Request to join a channel.
-message JoinChannelRequest {
-  string backend_id = 1;
-
-  // NOTE: this channel_name is the only place name is used for an identifier -
-  // all other times channels will be referred to by ID.
-  string channel_name = 2;
-}
-
-message JoinChannelResponse {}
-
-// Request to leave a channel.
-message LeaveChannelRequest {
-  string channel_id = 1;
-  string exit_message = 2;
-}
-
-message LeaveChannelResponse {}
 
 // Request to list all connected backends.
 message ListBackendsRequest {}
@@ -175,13 +122,6 @@ message ChannelInfoResponse {
   common.Channel channel = 1;
 }
 
-message UpdateChannelInfoRequest {
-  string channel_id = 1;
-  string topic = 2;
-}
-
-message UpdateChannelInfoResponse {}
-
 // A request for metadata about the running core instance.
 message CoreInfoRequest {}
 
@@ -192,16 +132,17 @@ message CoreInfoResponse {
 }
 
 service Seabird {
+  // The Firehose
   rpc StreamEvents(StreamEventsRequest) returns (stream Event);
 
   // Chat actions
-  rpc PerformAction(PerformActionRequest) returns (PerformActionResponse);
-  rpc PerformPrivateAction(PerformPrivateActionRequest) returns (PerformPrivateActionResponse);
-  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
-  rpc SendPrivateMessage(SendPrivateMessageRequest) returns (SendPrivateMessageResponse);
-  rpc JoinChannel(JoinChannelRequest) returns (JoinChannelResponse);
-  rpc LeaveChannel(LeaveChannelRequest) returns (LeaveChannelResponse);
-  rpc UpdateChannelInfo(UpdateChannelInfoRequest) returns (UpdateChannelInfoResponse);
+  rpc PerformAction(common.PerformActionRequest) returns (common.PerformActionResponse);
+  rpc PerformPrivateAction(common.PerformPrivateActionRequest) returns (common.PerformPrivateActionResponse);
+  rpc SendMessage(common.SendMessageRequest) returns (common.SendMessageResponse);
+  rpc SendPrivateMessage(common.SendPrivateMessageRequest) returns (common.SendPrivateMessageResponse);
+  rpc JoinChannel(common.JoinChannelRequest) returns (common.JoinChannelResponse);
+  rpc LeaveChannel(common.LeaveChannelRequest) returns (common.LeaveChannelResponse);
+  rpc UpdateChannelInfo(common.UpdateChannelInfoRequest) returns (common.UpdateChannelInfoResponse);
 
   // Chat backend introspection
   rpc ListBackends(ListBackendsRequest) returns (ListBackendsResponse);
