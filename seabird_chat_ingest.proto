@@ -17,6 +17,8 @@ package seabird;
 message PerformActionChatRequest {
   string channel_id = 1;
   string text = 2;
+
+  map<string, string> tags = 3;
 }
 
 // PerformPrivateActionRequest is often known as /me. Either SuccessChatEvent or
@@ -26,6 +28,8 @@ message PerformActionChatRequest {
 message PerformPrivateActionChatRequest {
   string user_id = 1;
   string text = 2;
+
+  map<string, string> tags = 3;
 }
 
 // SendMessageChatRequest requests for a message to be sent to a given channel.
@@ -35,6 +39,8 @@ message PerformPrivateActionChatRequest {
 message SendMessageChatRequest {
   string channel_id = 1;
   string text = 2;
+
+  map<string, string> tags = 3;
 }
 
 // SendPrivateMessageChatRequest requests for a message to be sent to a given
@@ -44,6 +50,8 @@ message SendMessageChatRequest {
 message SendPrivateMessageChatRequest {
   string user_id = 1;
   string text = 2;
+
+  map<string, string> tags = 3;
 }
 
 // JoinChannelChatRequest requests for the bot to join a channel with the given
@@ -51,6 +59,8 @@ message SendPrivateMessageChatRequest {
 // response if possible.
 message JoinChannelChatRequest {
   string channel_name = 1;
+
+  map<string, string> tags = 2;
 }
 
 // LeaveChannelChatRequest requests for the bot to leave the channel with the
@@ -58,6 +68,8 @@ message JoinChannelChatRequest {
 // response if possible.
 message LeaveChannelChatRequest {
   string channel_id = 1;
+
+  map<string, string> tags = 2;
 }
 
 // UpdateChannelInfoChatRequest requests for a the channel to be updated with the
@@ -66,6 +78,8 @@ message LeaveChannelChatRequest {
 message UpdateChannelInfoChatRequest {
   string channel_id = 1;
   string topic = 2;
+
+  map<string, string> tags = 3;
 }
 
 // MetadataChatRequest requests metadata about the given backend. seabird-core
@@ -182,6 +196,8 @@ message ChatEvent {
     // Introspection
     MetadataChatEvent metadata = 14;
   }
+
+  map<string, string> tags = 15;
 }
 
 // This service is exposed separately to the chat frontend. Its purpose is to

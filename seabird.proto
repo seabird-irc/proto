@@ -27,42 +27,8 @@ message Event {
     PerformActionEvent perform_action = 9;
     PerformPrivateActionEvent perform_private_action = 10;
   }
-}
 
-// SendMessageEvent will be emitted whenever a plugin or other client calls
-// SendMessage. Note that this will be emitted every time SendMessage is
-// called, not when it succeeds. The additional sender param refers to the
-// client sending the message.
-message SendMessageEvent {
-  string sender = 1;
-  SendMessageRequest inner = 2;
-}
-
-// SendPrivateMessageEvent will be emitted whenever a plugin or other client
-// calls SendPrivateMessage. Note that this will be emitted every time
-// SendPrivateMessage is called, not when it succeeds.The additional sender
-// param refers to the client sending the message.
-message SendPrivateMessageEvent {
-  string sender = 1;
-  SendPrivateMessageRequest inner = 2;
-}
-
-// PerformActionEvent will be emitted whenever a plugin or other client calls
-// PerformAction. Note that this will be emitted every time PerformAction is
-// called, not when it succeeds. The additional sender param refers to the
-// client sending the message.
-message PerformActionEvent {
-  string sender = 1;
-  PerformActionRequest inner = 2;
-}
-
-// PerformPrivateActionEvent will be emitted whenever a plugin or other client
-// calls PerformPrivateAction. Note that this will be emitted every time
-// PerformPrivateAction is called, not when it succeeds. The additional sender
-// param refers to the client sending the message.
-message PerformPrivateActionEvent {
-  string sender = 1;
-  PerformPrivateActionRequest inner = 2;
+  map<string, string> tags = 11;
 }
 
 // Request and response objects
@@ -89,39 +55,93 @@ message CommandMetadata {
   string full_help = 3;
 }
 
-// Requests a plugin can make
+// Requests a plugin can make. Each Request has a corresponding Event which has
+// a sender field added and the tags removed (because they are lifted up to the
+// higher level Event message). These message types must be kept in sync.
 
 // Perform an action in a given channel.
 message PerformActionRequest {
   string channel_id = 1;
   string text = 2;
+
+  map<string, string> tags = 3;
 }
 
 message PerformActionResponse {}
+
+// PerformActionEvent will be emitted whenever a plugin or other client calls
+// PerformAction. Note that this will be emitted every time PerformAction is
+// called, not when it succeeds. The additional sender param refers to the
+// client sending the message.
+message PerformActionEvent {
+  string sender = 1;
+
+  string channel_id = 2;
+  string text = 3;
+}
 
 // Perform an action in a private message.
 message PerformPrivateActionRequest {
   string user_id = 1;
   string text = 2;
+
+  map<string, string> tags = 3;
 }
 
 message PerformPrivateActionResponse {}
+
+// PerformPrivateActionEvent will be emitted whenever a plugin or other client
+// calls PerformPrivateAction. Note that this will be emitted every time
+// PerformPrivateAction is called, not when it succeeds. The additional sender
+// param refers to the client sending the message.
+message PerformPrivateActionEvent {
+  string sender = 1;
+
+  string user_id = 2;
+  string text = 3;
+}
 
 // Send a message to a given a channel.
 message SendMessageRequest {
   string channel_id = 1;
   string text = 2;
+
+  map<string, string> tags = 3;
 }
 
 message SendMessageResponse {}
+
+// SendMessageEvent will be emitted whenever a plugin or other client calls
+// SendMessage. Note that this will be emitted every time SendMessage is
+// called, not when it succeeds. The additional sender param refers to the
+// client sending the message.
+message SendMessageEvent {
+  string sender = 1;
+
+  string channel_id = 2;
+  string text = 3;
+}
 
 // Send a private message to a given user.
 message SendPrivateMessageRequest {
   string user_id = 1;
   string text = 2;
+
+  map<string, string> tags = 3;
 }
 
 message SendPrivateMessageResponse {}
+
+// SendPrivateMessageEvent will be emitted whenever a plugin or other client
+// calls SendPrivateMessage. Note that this will be emitted every time
+// SendPrivateMessage is called, not when it succeeds.The additional sender
+// param refers to the client sending the message.
+message SendPrivateMessageEvent {
+  string sender = 1;
+
+  string user_id = 2;
+  string text = 3;
+}
 
 // Request to join a channel.
 message JoinChannelRequest {
@@ -130,6 +150,8 @@ message JoinChannelRequest {
   // NOTE: this channel_name is the only place name is used for an identifier -
   // all other times channels will be referred to by ID.
   string channel_name = 2;
+
+  map<string, string> tags = 3;
 }
 
 message JoinChannelResponse {}
@@ -138,6 +160,8 @@ message JoinChannelResponse {}
 message LeaveChannelRequest {
   string channel_id = 1;
   string exit_message = 2;
+
+  map<string, string> tags = 3;
 }
 
 message LeaveChannelResponse {}
@@ -178,6 +202,8 @@ message ChannelInfoResponse {
 message UpdateChannelInfoRequest {
   string channel_id = 1;
   string topic = 2;
+
+  map<string, string> tags = 3;
 }
 
 message UpdateChannelInfoResponse {}
