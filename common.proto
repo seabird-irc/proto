@@ -27,6 +27,30 @@ package common;
 // different backend implementations, but they MUST decode to the same
 // components.
 
+// Tags are a set of key-value items which may expose additional information
+// about the given Event.
+//
+// All tags SHOULD be prefixed with something unique to that plugin or backend.
+// All tags starting with `seabird-core/` are reserved for use by seabird-core.
+//
+// Currently known tags:
+// - proxy/skip - this can be set to '1' if the message should not be proxied.
+//   Any other value means the message should be proxied. As an example, this is
+//   useful for metadata which some backends may already provide. Generally if a
+//   plugin uses this, it should respond to both normal events and the "send"
+//   variant of that message (such as MessageEvent/SendMessageEvent or
+//   ActionEvent/PerformActionEvent).
+//
+// Currently proposed tags:
+// - proxy/source-channel-id - set by the proxy plugin if a message is proxied,
+//   it will contain the original source channel ID
+// - proxy/source-channel-name - set by the proxy plugin if a message is
+//   proxied, it will contain the original source channel name
+// - proxy/source-user-id - set by the proxy plugin if a message is proxied, it
+//   will contain the original source user ID
+// - proxy/source-user-name - set by the proxy plugin if a message is proxied,
+//   it will contain the original source user name.
+
 // When sent by a chat backend, the ID MAY optionally be used as a hint to the
 // frontend to get the same external ID on reconnection. When sent by core to a
 // plugin, the ID MUST be an ID pointing to an exact backend instance.
